@@ -1,0 +1,41 @@
+{
+  "emulators": [
+    {
+      "id": "melonds",
+      "name": "Nintendo DS",
+      "icon": "assets/icons/nds.png",
+      "executable_names": ["melonDS.exe"],
+      "default_install_paths": [
+        "C:\\Emulators\\melonDS"
+      ],
+      "rom_extensions": [".nds", ".zip"],
+      "roms_folder": "roms/NDS",
+      "launch_args": "\"{rom_path}\"",
+      "config_file": "%APPDATA%\\melonDS\\melonDS.ini",
+      "safe_settings": {
+        "3DRenderer": "1",
+        "Threaded3D": "0",
+        "ScreenLayout": "0"
+      }
+    },
+    {
+      "id": "ppsspp",
+      "name": "PlayStation Portable",
+      "icon": "assets/icons/psp.png",
+      "executable_names": ["PPSSPPWindows64.exe", "PPSSPPWindows.exe"],
+      "default_install_paths": [
+        "%ProgramFiles%\\PPSSPP",
+        "%ProgramFiles(x86)%\\PPSSPP"
+      ],
+      "rom_extensions": [".iso", ".cso", ".pbp"],
+      "roms_folder": "roms/PSP",
+      "launch_args": "\"{rom_path}\"",
+      "config_file": "%MEMSTICK%\\PSP\\SYSTEM\\ppsspp.ini",
+      "safe_settings": {
+        "GraphicsBackend": "Vulkan",
+        "InternalResolution": "2",
+        "TextureScalingLevel": "0"
+      }
+    }
+  ]
+}
