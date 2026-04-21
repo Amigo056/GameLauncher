@@ -1,12 +1,25 @@
 {
   "emulators": [
     {
+      "id": "mupen64plus",
+      "name": "Nintendo 64",
+      "icon": "assets/icons/n64.png",
+      "executable_names": ["mupen64plus.exe"],
+      "default_install_paths": [
+        ".\\emulators\\M64Py"
+      ],
+      "rom_extensions": [".z64", ".n64", ".v64"],
+      "roms_folder": "roms/N64",
+      "launch_args": "--configdir \"{emulator_dir}\" --fullscreen \"{rom_path}\"",
+      "multiplayer": {"max_players": 4, "setup": "native"}
+    },
+    {
       "id": "melonds",
       "name": "Nintendo DS",
       "icon": "assets/icons/nds.png",
       "executable_names": ["melonDS.exe"],
       "default_install_paths": [
-        "C:\\Emulators\\melonDS"
+        ".\\emulators\\melonDS"
       ],
       "rom_extensions": [".nds", ".zip"],
       "roms_folder": "roms/NDS",
@@ -24,8 +37,7 @@
       "icon": "assets/icons/psp.png",
       "executable_names": ["PPSSPPWindows64.exe", "PPSSPPWindows.exe"],
       "default_install_paths": [
-        "%ProgramFiles%\\PPSSPP",
-        "%ProgramFiles(x86)%\\PPSSPP"
+        ".\\emulators\\PPSSPP"
       ],
       "rom_extensions": [".iso", ".cso", ".pbp"],
       "roms_folder": "roms/PSP",

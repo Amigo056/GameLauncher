@@ -1,0 +1,97 @@
+{
+  "name": "PS4 Default",
+  "controller_name": "PS4 Controller",
+  "guid": null,
+  "mappings": {
+    "dpad_up": {
+      "sdl_type": "button",
+      "sdl_index": 11,
+      "sdl_direction": null
+    },
+    "dpad_down": {
+      "sdl_type": "button",
+      "sdl_index": 12,
+      "sdl_direction": null
+    },
+    "dpad_left": {
+      "sdl_type": "button",
+      "sdl_index": 13,
+      "sdl_direction": null
+    },
+    "dpad_right": {
+      "sdl_type": "button",
+      "sdl_index": 14,
+      "sdl_direction": null
+    },
+    "start": {
+      "sdl_type": "button",
+      "sdl_index": 6,
+      "sdl_direction": null
+    },
+    "a_button": {
+      "sdl_type": "button",
+      "sdl_index": 0,
+      "sdl_direction": null
+    },
+    "b_button": {
+      "sdl_type": "button",
+      "sdl_index": 1,
+      "sdl_direction": null
+    },
+    "z_trig": {
+      "sdl_type": "axis",
+      "sdl_index": 4,
+      "sdl_direction": "+"
+    },
+    "r_trig": {
+      "sdl_type": "button",
+      "sdl_index": 10,
+      "sdl_direction": null
+    },
+    "l_trig": {
+      "sdl_type": "button",
+      "sdl_index": 9,
+      "sdl_direction": null
+    },
+    "c_up": {
+      "sdl_type": "axis",
+      "sdl_index": 3,
+      "sdl_direction": "-"
+    },
+    "c_down": {
+      "sdl_type": "axis",
+      "sdl_index": 3,
+      "sdl_direction": "+"
+    },
+    "c_left": {
+      "sdl_type": "axis",
+      "sdl_index": 2,
+      "sdl_direction": "-"
+    },
+    "c_right": {
+      "sdl_type": "axis",
+      "sdl_index": 2,
+      "sdl_direction": "+"
+    },
+    "analog_x": {
+      "sdl_type": "axis",
+      "sdl_index": 0,
+      "sdl_direction": null
+    },
+    "analog_y": {
+      "sdl_type": "axis",
+      "sdl_index": 1,
+      "sdl_direction": null
+    },
+    "mempak_switch": {
+      "sdl_type": "button",
+      "sdl_index": 7,
+      "sdl_direction": null
+    },
+    "rumblepak_switch": {
+      "sdl_type": "button",
+      "sdl_index": 5,
+      "sdl_direction": null
+    }
+  }
+}
