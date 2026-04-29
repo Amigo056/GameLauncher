@@ -1,11 +1,12 @@
 {
-  "window_state": {
-    "width": 1920,
-    "height": 1046,
-    "x": -11,
-    "y": -11,
-    "maximized": true
-  },
   "roms_base_path": "roms",
-  "last_selected_emulator": null
+  "last_selected_emulator": null,
+  "cover_cache_enabled": true,
+  "window_state": {
+    "width": 1280,
+    "height": 697,
+    "x": -8,
+    "y": -8,
+    "maximized": true
+  }
 }

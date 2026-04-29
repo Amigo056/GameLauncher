@@ -22,16 +22,6 @@ class GameRepository(ABC):
         pass
     
     @abstractmethod
-    def find_by_path(self, rom_path: Path) -> Optional[Game]:
-        """Busca jogo pelo path exato da ROM."""
-        pass
-    
-    @abstractmethod
-    def find_by_filename(self, filename: str) -> Optional[Game]:
-        """Busca por nome de arquivo (fuzzy matching)."""
-        pass
-    
-    @abstractmethod
     def get_installed_games(self, emulator: Optional[Emulator] = None) -> List[Game]:
         """
         Retorna todos os jogos instalados.

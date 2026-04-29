@@ -81,15 +81,16 @@ class Emulator:
         exe_abs = self.executable_path.resolve()
         emulator_dir = str(exe_abs.parent).replace('"', '\\"')
         
-        screen_w, screen_h = self._get_screen_resolution()
-        resolution_arg = f"--resolution {screen_w}x{screen_h}"
-
         args = self.launch_args_template.format(
             rom_path=rom_str,
             emulator_dir=emulator_dir
         )
+        if self.id == "mupen64plus":
+            screen_w, screen_h = self._get_screen_resolution()
+            resolution_arg = f"--resolution {screen_w}x{screen_h}"
+            return f'"{exe_abs}" {resolution_arg} {args}'
         
-        return f'"{exe_abs}" {resolution_arg} {args}'
+        return f'"{exe_abs}" {args}'
     
     def supports_extension(self, ext: str) -> bool:
         """Verifica se extensão é suportada."""

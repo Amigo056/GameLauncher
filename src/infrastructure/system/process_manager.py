@@ -7,7 +7,7 @@ from typing import Optional
 
 import psutil
 
-from src.application.launch_emulator import ProcessManager
+from src.application.protocols.process_manager import ProcessManager
 
 
 class SubprocessProcessManager(ProcessManager):
@@ -45,12 +45,7 @@ class SubprocessProcessManager(ProcessManager):
             
             exe_path = exe_path.resolve()
             working_dir = exe_path.parent
-            
-            print(f"[DEBUG] exe_path: {exe_path}")
-            print(f"[DEBUG] working_dir: {working_dir}")
-            print(f"[DEBUG] command: {command}")
-            print(f"[DEBUG] exe exists: {exe_path.exists()}")
-
+        
             if self.system == "Windows":
                 process = subprocess.Popen(
                     command,
