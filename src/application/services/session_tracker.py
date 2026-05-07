@@ -147,6 +147,12 @@ class SessionTracker:
         """Retorna sessões recentes."""
         return self.session_repo.get_recent_sessions(limit)
 
+    def get_game_stats(self, game_id: str):
+        """Retorna estatisticas agregadas de um jogo, se existirem."""
+        if hasattr(self.session_repo, "get_game_stats"):
+            return self.session_repo.get_game_stats(game_id)
+        return None
+
     @staticmethod
     def _format_duration(seconds: int) -> str:
         """Formata segundos para human-readable."""

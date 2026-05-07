@@ -15,6 +15,7 @@ from src.infrastructure.config.config_loader import ConfigLoader
 from src.infrastructure.config.config_validator import ConfigValidator
 from src.infrastructure.config.config_mapper import ConfigMapper
 from src.application.services.cover_service import CoverService
+from src.application.services.save_manager import SaveManager
 from src.application.services.settings_service import SettingsService
 from src.application.use_cases.scan_library import ScanLibraryUseCase
 from src.application.services.session_tracker import SessionTracker
@@ -51,6 +52,7 @@ class Container:
         self._graphics_profile_registry: Optional[GraphicsProfileRegistry] = None
         self._hardware_probe: Optional[HardwareProbe] = None
         self._graphics_config_writer: Optional[GraphicsConfigWriter] = None
+        self._save_manager: Optional[SaveManager] = None
 
     @property
     def event_bus(self) -> EventBus:
@@ -119,6 +121,12 @@ class Container:
                 event_bus=self.event_bus,
             )
         return self._session_tracker
+
+    @property
+    def save_manager(self) -> SaveManager:
+        if self._save_manager is None:
+            self._save_manager = SaveManager()
+        return self._save_manager
 
     @property
     def config_loader(self) -> ConfigLoader:

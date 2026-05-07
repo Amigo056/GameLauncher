@@ -69,6 +69,10 @@ class SaveManager:
         
         return saves
 
+    def list_current_saves(self, game: Game) -> List[Path]:
+        """Lista ficheiros de save atualmente ao lado da ROM."""
+        return sorted(set(self._find_save_files(game)))
+
     def create_save_slot(self, game: Game, slot_name: str) -> SaveSlot:
         """
         Cria um novo slot de save copiando os saves atuais do jogo.

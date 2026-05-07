@@ -23,6 +23,7 @@ class AppSettings:
     window_state: WindowState = field(default_factory=WindowState)
     cover_cache_enabled: bool = True
     graphics_profiles: dict[str, str] = field(default_factory=dict)
+    favorite_games: dict[str, list[str]] = field(default_factory=dict)
 
 
 class SettingsService:
@@ -57,6 +58,9 @@ class SettingsService:
                 window_state=window_state,
                 cover_cache_enabled=data.get("cover_cache_enabled", True),
                 graphics_profiles=data.get("graphics_profiles", {}),
+                favorite_games=self._normalize_favorites(
+                    data.get("favorite_games", {})
+                ),
             )
 
         except Exception as e:
@@ -72,6 +76,7 @@ class SettingsService:
             "last_selected_emulator": settings.last_selected_emulator,
             "cover_cache_enabled": settings.cover_cache_enabled,
             "graphics_profiles": settings.graphics_profiles,
+            "favorite_games": settings.favorite_games,
             "window_state": {
                 "width": settings.window_state.width,
                 "height": settings.window_state.height,
@@ -130,3 +135,50 @@ class SettingsService:
         settings = self.load()
         settings.graphics_profiles[emulator_id] = level.value
         self.save(settings)
+
+    def get_favorite_games(self, emulator_id: str) -> set[str]:
+        """Retorna os IDs favoritos para um emulador."""
+        settings = self.load()
+        return set(settings.favorite_games.get(emulator_id, []))
+
+    def is_favorite_game(self, emulator_id: str, game_id: str) -> bool:
+        """Verifica se um jogo esta marcado como favorito."""
+        return game_id in self.get_favorite_games(emulator_id)
+
+    def set_favorite_game(
+        self,
+        emulator_id: str,
+        game_id: str,
+        favorite: bool,
+    ) -> bool:
+        """Marca ou desmarca um jogo como favorito e retorna o novo estado."""
+        settings = self.load()
+        favorites = list(dict.fromkeys(settings.favorite_games.get(emulator_id, [])))
+
+        if favorite and game_id not in favorites:
+            favorites.append(game_id)
+        elif not favorite:
+            favorites = [current for current in favorites if current != game_id]
+
+        settings.favorite_games[emulator_id] = favorites
+        self.save(settings)
+        return favorite
+
+    def toggle_favorite_game(self, emulator_id: str, game_id: str) -> bool:
+        """Alterna o favorito de um jogo e retorna o novo estado."""
+        current = self.is_favorite_game(emulator_id, game_id)
+        return self.set_favorite_game(emulator_id, game_id, not current)
+
+    def _normalize_favorites(self, raw: object) -> dict[str, list[str]]:
+        """Normaliza favoritos vindos do JSON antigo ou editado manualmente."""
+        if not isinstance(raw, dict):
+            return {}
+
+        normalized: dict[str, list[str]] = {}
+        for emulator_id, game_ids in raw.items():
+            if not isinstance(emulator_id, str) or not isinstance(game_ids, list):
+                continue
+            normalized[emulator_id] = list(
+                dict.fromkeys(str(game_id) for game_id in game_ids if game_id)
+            )
+        return normalized

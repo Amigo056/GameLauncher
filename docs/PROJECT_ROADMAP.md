@@ -262,6 +262,22 @@ Definition of done:
 - Cada jogo tem detalhe, playtime, saves e estado visual aceitavel.
 - Capas ausentes nao deixam a UI parecer partida.
 
+Estado atual:
+
+- Em progresso.
+- Scan local ja ordena resultados e mostra titulos mais limpos na UI.
+- Favoritos ja ficam guardados em `config/settings.json`.
+- Biblioteca ja tem filtros `Todos`, `Favoritos` e `Recentes`.
+- Pagina de detalhe ja mostra capa, informacao da ROM, estatisticas e saves.
+- Backups manuais de saves ja podem ser criados pela pagina de detalhe.
+
+Proximos passos desta fase:
+
+- Melhorar estrategia de capas GBA sem depender apenas de screenshot via emulador.
+- Melhorar capas NDS quando a ROM nao tem icon/banner utilizavel.
+- Mostrar historico de sessoes por jogo na pagina de detalhe.
+- Evoluir saves para restaurar/eliminar backups pela UI.
+
 ### Fase 2 - Controlos E Perfis Por Jogador
 
 Objetivo: ligar comandos e mapear botoes sem editar ficheiros manualmente.

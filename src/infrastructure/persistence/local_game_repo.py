@@ -1,5 +1,6 @@
 """Implementação concreta: Repositório de jogos locais (filesystem)."""
 import hashlib
+import logging
 import re
 import unicodedata
 from pathlib import Path
@@ -9,6 +10,8 @@ from datetime import datetime
 from src.domain.entities.game import Game, Rom, Region
 from src.domain.entities.emulator import Emulator
 from src.application.ports.game_repository import GameRepository, RomNotFoundError
+
+logger = logging.getLogger(__name__)
 
 
 class LocalGameRepository(GameRepository):
@@ -32,7 +35,10 @@ class LocalGameRepository(GameRepository):
                           for ext in extensions]
         
         for ext in extensions_lower:
-            for file_path in directory.rglob(f"*{ext}"):
+            for file_path in sorted(
+                directory.rglob(f"*{ext}"),
+                key=lambda p: str(p).lower(),
+            ):
                 if not file_path.is_file():
                     continue
                 
@@ -46,7 +52,7 @@ class LocalGameRepository(GameRepository):
                     
                     game = Game(
                         id=self._filename_to_id(file_path.stem),
-                        title=file_path.stem,  # Título temporário
+                        title=self._filename_to_title(file_path.stem),
                         rom=rom,
                         region=self._detect_region_from_filename(file_path.name)
                     )
@@ -55,7 +61,7 @@ class LocalGameRepository(GameRepository):
                     self._cache[file_path] = rom
                     
                 except (OSError, PermissionError) as e:
-                    print(f"Erro lendo {file_path}: {e}")
+                    logger.warning("Erro ao ler ROM %s: %s", file_path, e)
                     continue
         
         self._last_scan = datetime.now()
@@ -80,8 +86,9 @@ class LocalGameRepository(GameRepository):
                 if path.is_relative_to(directory):
                     game = Game(
                         id=self._filename_to_id(path.stem),
-                        title=path.stem,
+                        title=self._filename_to_title(path.stem),
                         rom=rom,
+                        region=self._detect_region_from_filename(path.name),
                     )
                     cached.append(game)
             
@@ -102,7 +109,7 @@ class LocalGameRepository(GameRepository):
                 del self._cache[game.rom.file_path]
             return True
         except Exception as e:
-            print(f"Erro deletando {game.rom.file_path}: {e}")
+            logger.warning("Erro ao apagar ROM %s: %s", game.rom.file_path, e)
             return False
     
     def validate_rom(self, game: Game) -> bool:
@@ -148,6 +155,14 @@ class LocalGameRepository(GameRepository):
         for char in invalid:
             name = name.replace(char, '')
         return name.strip()
+
+    def _filename_to_title(self, filename: str) -> str:
+        """Converte nome de ficheiro num titulo legivel para a UI."""
+        title = re.sub(r"\s*[\(\[][^\)\]]*[\)\]]", "", filename)
+        title = re.sub(r"[_\.]+", " ", title)
+        title = re.sub(r"\s+-\s+", " - ", title)
+        title = " ".join(title.split())
+        return title or filename
     
     def _normalize_filename(self, filename: str) -> str:
         """Normaliza para comparação fuzzy."""

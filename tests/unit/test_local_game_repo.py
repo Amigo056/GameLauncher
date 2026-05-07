@@ -45,6 +45,11 @@ class TestLocalGameRepository:
         assert repo._filename_to_id("Pokémon Red") == "pokemon-red"
         assert repo._filename_to_id("Game (USA)") == "game-usa"
 
+    def test_filename_to_title_removes_region_tags(self, repo):
+        """Deve mostrar títulos limpos na UI sem perder o ID completo."""
+        assert repo._filename_to_title("Pokemon Fire Red (USA)") == "Pokemon Fire Red"
+        assert repo._filename_to_title("Mario_Kart_DS_[Europe]") == "Mario Kart DS"
+
     def test_detect_region_usa(self, repo):
         """Deve detetar região USA."""
         assert repo._detect_region_from_filename("Game (USA).nds") == Region.USA

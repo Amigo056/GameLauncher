@@ -30,6 +30,9 @@ class GameCard(tk.Frame):
         image_cache: dict,
         frame_ref: tk.Widget,
         stats_text: str = "",
+        on_details: callable | None = None,
+        on_toggle_favorite: callable | None = None,
+        is_favorite: bool = False,
     ):
         t = DARK_THEME
         super().__init__(parent, bg=t.bg_card, padx=8, pady=8, cursor='hand2')
@@ -41,6 +44,10 @@ class GameCard(tk.Frame):
         self._image_cache = image_cache
         self._frame_ref = frame_ref
         self.stats_text = stats_text
+        self.on_details = on_details
+        self.on_toggle_favorite = on_toggle_favorite
+        self.is_favorite = is_favorite
+        self._btn_favorite: tk.Button | None = None
 
         self._build()
         self._load_cover_async()
@@ -87,24 +94,79 @@ class GameCard(tk.Frame):
                 font=(t.font_family, t.font_size_sm),
             ).pack(pady=(2, 0))
 
+        actions = tk.Frame(self, bg=t.bg_card)
+        actions.pack(pady=(8, 0), fill='x')
+
+        if self.on_toggle_favorite:
+            self._btn_favorite = tk.Button(
+                actions,
+                text="*" if self.is_favorite else "+",
+                width=3,
+                bg=t.bg_tertiary,
+                fg=t.warning if self.is_favorite else t.text_secondary,
+                activebackground=t.bg_hover,
+                activeforeground=t.warning,
+                relief='flat',
+                cursor='hand2',
+                command=self._toggle_favorite,
+            )
+            self._btn_favorite.pack(side='left', padx=(0, 4))
+
+        if self.on_details:
+            tk.Button(
+                actions,
+                text="Info",
+                bg=t.bg_tertiary,
+                fg=t.text_primary,
+                activebackground=t.bg_hover,
+                activeforeground=t.text_primary,
+                relief='flat',
+                cursor='hand2',
+                command=lambda g=self.game: self.on_details(g),
+            ).pack(side='left', expand=True, fill='x', padx=(0, 4))
+
+        tk.Button(
+            actions,
+            text="Jogar",
+            bg=t.accent,
+            fg=t.text_primary,
+            activebackground=t.accent_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            cursor='hand2',
+            command=lambda g=self.game: self.on_play(g),
+        ).pack(side='left', expand=True, fill='x')
+
         for widget in [self, self._lbl_cover]:
             widget.bind('<Button-1>', lambda e, g=self.game: self.on_play(g))
 
         self.bind('<Enter>', self._on_enter)
         self.bind('<Leave>', self._on_leave)
 
+    def _toggle_favorite(self):
+        if not self.on_toggle_favorite:
+            return
+
+        self.is_favorite = bool(self.on_toggle_favorite(self.game))
+        if self._btn_favorite:
+            t = DARK_THEME
+            self._btn_favorite.configure(
+                text="*" if self.is_favorite else "+",
+                fg=t.warning if self.is_favorite else t.text_secondary,
+            )
+
     def _on_enter(self, _=None):
         t = DARK_THEME
         self.configure(bg=t.bg_hover)
         for child in self.winfo_children():
-            if isinstance(child, tk.Label):
+            if isinstance(child, (tk.Label, tk.Frame)):
                 child.configure(bg=t.bg_hover)
 
     def _on_leave(self, _=None):
         t = DARK_THEME
         self.configure(bg=t.bg_card)
         for child in self.winfo_children():
-            if isinstance(child, tk.Label):
+            if isinstance(child, (tk.Label, tk.Frame)):
                 child.configure(bg=t.bg_card)
 
     def _load_cover_async(self):

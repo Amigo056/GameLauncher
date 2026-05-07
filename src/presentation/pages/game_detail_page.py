@@ -1,54 +1,72 @@
-"""Página de detalhes do jogo — stub funcional para Semana 1."""
+"""Pagina de detalhes de um jogo instalado."""
 import tkinter as tk
+from datetime import datetime
 from typing import Callable
 
-from src.domain.entities.game import Game
+from PIL import Image, ImageTk
+
+from src.application.services.save_manager import SaveManager
+from src.application.services.session_tracker import SessionTracker
+from src.application.services.settings_service import SettingsService
 from src.domain.entities.emulator import Emulator
-from src.presentation.theme import DARK_THEME, font
+from src.domain.entities.game import Game
+from src.presentation.theme import DARK_THEME, font, mono_font
+from src.presentation.widgets.toast import Toast
 
 
 class GameDetailPage:
-    """
-    Página de detalhes do jogo.
-    
-    Stub funcional (Semana 1) — mostra informações básicas.
-    Futuro: metadados completos, tempo de jogo, histórico de sessões.
-    """
+    """Mostra capa, metadados, estatisticas e saves de um jogo."""
+
+    COVER_SIZE = (260, 180)
 
     def __init__(
         self,
         parent: tk.Widget,
+        root_window: tk.Tk,
         game: Game,
         emulator: Emulator,
+        session_tracker: SessionTracker,
+        save_manager: SaveManager,
+        settings_service: SettingsService,
         on_back: Callable,
         on_play: Callable[[Game], None],
+        on_favorite_changed: Callable[[Game, bool], None] | None = None,
     ):
         t = DARK_THEME
         self.frame = tk.Frame(parent, bg=t.bg_primary)
+        self.root = root_window
         self.game = game
         self.emulator = emulator
+        self.session_tracker = session_tracker
+        self.save_manager = save_manager
+        self.settings_service = settings_service
         self.on_back = on_back
         self.on_play = on_play
+        self.on_favorite_changed = on_favorite_changed
+        self._cover_photo: ImageTk.PhotoImage | None = None
+        self._favorite_button: tk.Button | None = None
+        self._saves_body: tk.Frame | None = None
 
         self._build_ui()
 
     def _build_ui(self):
-        """Constrói interface de detalhes básica."""
+        """Constroi a interface principal."""
         t = DARK_THEME
-        
-        # Header
+
         header = tk.Frame(self.frame, bg=t.bg_primary, padx=20, pady=15)
         header.pack(fill='x')
 
         tk.Button(
             header,
-            text="← Voltar",
+            text="Voltar",
             font=font(t, "font_size_md"),
             bg=t.bg_tertiary,
             fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
             relief='flat',
             cursor='hand2',
-            command=self.on_back
+            command=self.on_back,
         ).pack(side='left')
 
         tk.Label(
@@ -56,35 +74,190 @@ class GameDetailPage:
             text=self.game.title,
             bg=t.bg_primary,
             fg=t.text_primary,
-            font=font(t, "font_size_2xl", bold=True)
+            font=font(t, "font_size_2xl", bold=True),
         ).pack(side='left', padx=20)
 
-        # Container principal
         main = tk.Frame(self.frame, bg=t.bg_primary)
-        main.pack(fill='both', expand=True, padx=40, pady=20)
+        main.pack(fill='both', expand=True, padx=28, pady=(5, 24))
+        main.grid_columnconfigure(1, weight=1)
+        main.grid_rowconfigure(0, weight=1)
 
-        # Info básica
-        info = tk.Frame(main, bg=t.bg_secondary, padx=30, pady=30)
-        info.pack(fill='x', pady=(0, 20))
+        left = tk.Frame(main, bg=t.bg_primary)
+        left.grid(row=0, column=0, sticky='nw', padx=(0, 24))
 
-        details = [
+        right = tk.Frame(main, bg=t.bg_primary)
+        right.grid(row=0, column=1, sticky='nsew')
+
+        self._build_cover_panel(left)
+        self._build_stats_section(right)
+        self._build_info_section(right)
+        self._build_saves_section(right)
+
+    def _build_cover_panel(self, parent: tk.Widget):
+        t = DARK_THEME
+
+        panel = tk.Frame(parent, bg=t.bg_secondary, padx=18, pady=18)
+        panel.pack(fill='x')
+
+        cover = tk.Label(
+            panel,
+            bg=t.bg_tertiary,
+            fg=t.text_disabled,
+            width=self.COVER_SIZE[0] // 9,
+            height=self.COVER_SIZE[1] // 18,
+            text="Sem capa",
+            font=font(t, "font_size_lg", bold=True),
+        )
+        cover.pack()
+        self._load_cover(cover)
+
+        tk.Button(
+            panel,
+            text="Jogar",
+            font=font(t, "font_size_lg", bold=True),
+            bg=t.accent,
+            fg=t.text_primary,
+            activebackground=t.accent_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            cursor='hand2',
+            width=22,
+            pady=8,
+            command=lambda: self.on_play(self.game),
+        ).pack(fill='x', pady=(18, 8))
+
+        self._favorite_button = tk.Button(
+            panel,
+            text=self._favorite_button_text(),
+            font=font(t, "font_size_md"),
+            bg=t.bg_tertiary,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            cursor='hand2',
+            width=22,
+            pady=6,
+            command=self._toggle_favorite,
+        )
+        self._favorite_button.pack(fill='x')
+
+    def _build_stats_section(self, parent: tk.Widget):
+        t = DARK_THEME
+        section = self._section(parent, "Estatisticas")
+        stats = self.session_tracker.get_game_stats(self.game.id)
+
+        if not stats:
+            self._muted_label(section, "Ainda sem sessoes registadas.")
+            return
+
+        rows = [
+            ("Tempo total", self.session_tracker._format_duration(int(stats.total_playtime_seconds))),
+            ("Sessoes", str(stats.total_sessions)),
+            ("Ultima vez", self._format_datetime(stats.last_played)),
+            ("Media", self.session_tracker._format_duration(int(stats.average_session_seconds))),
+        ]
+        self._detail_rows(section, rows)
+
+    def _build_info_section(self, parent: tk.Widget):
+        section = self._section(parent, "Informacao")
+        platform_value = getattr(self.emulator.platform, "value", str(self.emulator.platform))
+        rows = [
             ("ID", self.game.id),
-            ("Título", self.game.title),
-            ("Região", self.game.region.name),
+            ("Titulo", self.game.title),
+            ("Regiao", self.game.region.name),
             ("Emulador", self.emulator.name),
-            ("Plataforma", self.emulator.platform.value),
+            ("Plataforma", platform_value),
         ]
 
         if self.game.rom:
-            details.extend([
-                ("Ficheiro", self.game.rom.file_path.name),
-                ("Tamanho", self._format_size(self.game.rom.file_size)),
-                ("Extensão", self.game.rom.extension),
-            ])
+            rows.extend(
+                [
+                    ("Ficheiro", self.game.rom.file_path.name),
+                    ("Pasta", str(self.game.rom.file_path.parent)),
+                    ("Tamanho", self._format_size(self.game.rom.file_size)),
+                    ("Extensao", self.game.rom.extension),
+                ]
+            )
 
-        for label, value in details:
-            row = tk.Frame(info, bg=t.bg_secondary)
-            row.pack(fill='x', pady=4)
+        self._detail_rows(section, rows, mono_labels={"ID", "Pasta"})
+
+    def _build_saves_section(self, parent: tk.Widget):
+        t = DARK_THEME
+        section = self._section(parent, "Saves")
+
+        toolbar = tk.Frame(section, bg=t.bg_secondary)
+        toolbar.pack(fill='x', pady=(0, 8))
+
+        tk.Button(
+            toolbar,
+            text="Criar backup",
+            bg=t.bg_tertiary,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            cursor='hand2',
+            command=self._create_manual_backup,
+        ).pack(side='left')
+
+        self._saves_body = tk.Frame(section, bg=t.bg_secondary)
+        self._saves_body.pack(fill='x')
+        self._render_saves_body()
+
+    def _render_saves_body(self):
+        if not self._saves_body:
+            return
+
+        for child in self._saves_body.winfo_children():
+            child.destroy()
+
+        current_saves = self.save_manager.list_current_saves(self.game)
+        slots = self.save_manager.list_save_slots(self.game) if self.game.rom else []
+
+        if current_saves:
+            self._muted_label(
+                self._saves_body,
+                f"{len(current_saves)} ficheiro(s) de save atual encontrado(s).",
+            )
+        else:
+            self._muted_label(self._saves_body, "Nenhum save atual encontrado junto da ROM.")
+
+        if not slots:
+            self._muted_label(self._saves_body, "Ainda nao existem backups guardados.")
+            return
+
+        for slot in slots[:5]:
+            label = (
+                f"{slot.name} - {self._format_datetime(slot.created_at)} - "
+                f"{self._format_size(slot.file_size)}"
+            )
+            self._muted_label(self._saves_body, label)
+
+    def _section(self, parent: tk.Widget, title: str) -> tk.Frame:
+        t = DARK_THEME
+        frame = tk.Frame(parent, bg=t.bg_secondary, padx=18, pady=14)
+        frame.pack(fill='x', pady=(0, 14))
+        tk.Label(
+            frame,
+            text=title,
+            bg=t.bg_secondary,
+            fg=t.text_primary,
+            font=font(t, "font_size_lg", bold=True),
+        ).pack(anchor='w', pady=(0, 10))
+        return frame
+
+    def _detail_rows(
+        self,
+        parent: tk.Widget,
+        rows: list[tuple[str, str]],
+        mono_labels: set[str] | None = None,
+    ):
+        t = DARK_THEME
+        mono_labels = mono_labels or set()
+        for label, value in rows:
+            row = tk.Frame(parent, bg=t.bg_secondary)
+            row.pack(fill='x', pady=3)
             tk.Label(
                 row,
                 text=f"{label}:",
@@ -92,62 +265,121 @@ class GameDetailPage:
                 fg=t.text_secondary,
                 font=font(t, "font_size_md"),
                 width=12,
-                anchor='w'
+                anchor='w',
             ).pack(side='left')
             tk.Label(
                 row,
                 text=str(value),
                 bg=t.bg_secondary,
                 fg=t.text_primary,
-                font=font(t, "font_size_md", bold=True),
-                anchor='w'
-            ).pack(side='left', padx=(10, 0))
+                font=mono_font(t, "font_size_sm") if label in mono_labels else font(t),
+                anchor='w',
+                justify='left',
+                wraplength=720,
+            ).pack(side='left', padx=(10, 0), fill='x', expand=True)
 
-        # Botão Jogar
-        if self.game.is_available_locally:
-            tk.Button(
-                main,
-                text="▶  Jogar",
-                font=font(t, "font_size_xl", bold=True),
-                bg=t.accent,
-                fg=t.text_primary,
-                activebackground=t.accent_hover,
-                relief='flat',
-                cursor='hand2',
-                width=20,
-                height=2,
-                command=self._on_play
-            ).pack(pady=20)
-        else:
-            tk.Label(
-                main,
-                text="ROM não disponível localmente",
-                bg=t.bg_primary,
-                fg=t.error,
-                font=font(t, "font_size_md")
-            ).pack(pady=20)
-
-        # Placeholder para futuras features
+    def _muted_label(self, parent: tk.Widget, text: str):
+        t = DARK_THEME
         tk.Label(
-            main,
-            text="📊 Estatísticas de jogo em breve…",
-            bg=t.bg_primary,
-            fg=t.text_disabled,
-            font=font(t, "font_size_md")
-        ).pack(pady=(40, 0))
+            parent,
+            text=text,
+            bg=t.bg_secondary,
+            fg=t.text_secondary,
+            font=font(t, "font_size_md"),
+            anchor='w',
+            justify='left',
+            wraplength=820,
+        ).pack(fill='x', pady=2)
 
-    def _format_size(self, size_bytes: int) -> str:
-        """Formata bytes para human-readable."""
-        for unit in ['B', 'KB', 'MB', 'GB']:
-            if size_bytes < 1024:
-                return f"{size_bytes:.1f} {unit}"
-            size_bytes /= 1024
-        return f"{size_bytes:.1f} TB"
+    def _load_cover(self, label: tk.Label):
+        cover_path = (
+            self.game.cover.local_path
+            if self.game.cover and self.game.cover.is_local
+            else None
+        )
+        if not cover_path or not cover_path.exists():
+            return
 
-    def _on_play(self):
-        """Callback para iniciar o jogo."""
-        self.on_play(self.game)
+        try:
+            img = Image.open(cover_path).convert("RGBA")
+            orig_w, orig_h = img.size
+            ratio = min(self.COVER_SIZE[0] / orig_w, self.COVER_SIZE[1] / orig_h)
+            new_w = max(1, int(orig_w * ratio))
+            new_h = max(1, int(orig_h * ratio))
+            img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+            bg = Image.new("RGBA", self.COVER_SIZE, (51, 51, 51, 255))
+            bg.paste(
+                img,
+                ((self.COVER_SIZE[0] - new_w) // 2, (self.COVER_SIZE[1] - new_h) // 2),
+                img,
+            )
+            self._cover_photo = ImageTk.PhotoImage(bg)
+            label.configure(
+                image=self._cover_photo,
+                text="",
+                width=self.COVER_SIZE[0],
+                height=self.COVER_SIZE[1],
+            )
+        except Exception:
+            return
+
+    def _toggle_favorite(self):
+        is_favorite = self.settings_service.toggle_favorite_game(
+            self.emulator.id,
+            self.game.id,
+        )
+        if self._favorite_button:
+            self._favorite_button.configure(text=self._favorite_button_text())
+
+        if self.on_favorite_changed:
+            self.on_favorite_changed(self.game, is_favorite)
+
+        Toast.show(
+            self.root,
+            f"{self.game.title}: {'favorito' if is_favorite else 'removido dos favoritos'}",
+            level="success" if is_favorite else "info",
+            duration=1800,
+        )
+
+    def _favorite_button_text(self) -> str:
+        if self.settings_service.is_favorite_game(self.emulator.id, self.game.id):
+            return "Remover favorito"
+        return "Adicionar favorito"
+
+    def _create_manual_backup(self):
+        current_saves = self.save_manager.list_current_saves(self.game)
+        if not current_saves:
+            Toast.show(
+                self.root,
+                "Nao encontrei saves atuais para criar backup.",
+                level="warning",
+                duration=3000,
+            )
+            return
+
+        slot = self.save_manager.create_save_slot(self.game, "manual")
+        self._render_saves_body()
+        Toast.show(
+            self.root,
+            f"Backup criado: {self._format_size(slot.file_size)}",
+            level="success",
+            duration=2500,
+        )
+
+    def _format_size(self, size_bytes: int | float) -> str:
+        size = float(size_bytes or 0)
+        for unit in ["B", "KB", "MB", "GB"]:
+            if size < 1024:
+                return f"{size:.1f} {unit}"
+            size /= 1024
+        return f"{size:.1f} TB"
+
+    def _format_datetime(self, value: datetime | None) -> str:
+        if value is None:
+            return "Nunca"
+        return value.strftime("%d/%m/%Y %H:%M")
 
     def destroy(self):
-        """Esconde em vez de destruir."""
+        """Esconde a pagina."""
         self.frame.place_forget()

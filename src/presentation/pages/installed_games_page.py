@@ -24,6 +24,7 @@ class InstalledGamesPage:
         scan_use_case: ScanLibraryUseCase,
         on_back: callable,
         on_config_controller: callable = None,
+        on_show_details: callable = None,
     ):
         t = DARK_THEME
         self.frame = tk.Frame(parent, bg=t.bg_primary)
@@ -33,6 +34,7 @@ class InstalledGamesPage:
         self.scan_use_case = scan_use_case
         self.on_back       = on_back
         self.on_config_controller = on_config_controller
+        self.on_show_details = on_show_details
 
         self.games: list[Game] = []
         self._image_cache: dict = {}
@@ -127,6 +129,7 @@ class InstalledGamesPage:
         ).pack(side='left', padx=8, ipady=4)
 
         self._build_graphics_selector(search_bar)
+        self._build_library_filters(search_bar)
 
         outer = tk.Frame(self.frame, bg=t.bg_primary)
         outer.pack(fill='both', expand=True, pady=(5, 0))
@@ -147,6 +150,34 @@ class InstalledGamesPage:
         self.canvas.pack(side="left", fill="both", expand=True, padx=(20, 0))
 
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
+    def _build_library_filters(self, parent: tk.Widget):
+        """Cria filtros simples para uso diario da biblioteca."""
+        t = DARK_THEME
+        filter_frame = tk.Frame(parent, bg=t.bg_primary)
+        filter_frame.pack(side='left', padx=(18, 0))
+
+        self._filter_var = tk.StringVar(value="Todos")
+        for label in ("Todos", "Favoritos", "Recentes"):
+            button = tk.Radiobutton(
+                filter_frame,
+                text=label,
+                value=label,
+                variable=self._filter_var,
+                command=self._render_current_view,
+                indicatoron=False,
+                bg=t.bg_card,
+                fg=t.text_primary,
+                selectcolor=t.accent,
+                activebackground=t.bg_hover,
+                activeforeground=t.text_primary,
+                relief='flat',
+                cursor='hand2',
+                padx=10,
+                pady=4,
+                font=font(t, "font_size_sm"),
+            )
+            button.pack(side='left', padx=(0, 4))
 
     def _build_graphics_selector(self, parent: tk.Widget):
         """Cria seletor de perfil grafico por emulador."""
@@ -250,6 +281,13 @@ class InstalledGamesPage:
             pass
         return ""
 
+    def _get_last_played(self, game: Game):
+        try:
+            stats = self._session_tracker.get_game_stats(game.id)
+            return stats.last_played if stats else None
+        except Exception:
+            return None
+
     def _clear_grid(self):
         for widget in self.grid_frame.winfo_children():
             widget.destroy()
@@ -314,15 +352,14 @@ class InstalledGamesPage:
     def _on_games_loaded(self, games: list[Game]):
         t = DARK_THEME
         self.games = games
-        count = len(games)
-        self.lbl_count.config(text=f"{count} jogo{'s' if count != 1 else ''}")
         self._hide_progress()
 
         if not games:
+            self.lbl_count.config(text="0 jogos")
             self._show_empty_state()
             return
 
-        self.frame.after(100, lambda: self._render_grid(games))
+        self.frame.after(100, self._render_current_view)
 
     def _on_scan_error(self, error_msg: str):
         self._hide_progress()
@@ -337,21 +374,45 @@ class InstalledGamesPage:
         self.lbl_count.config(text="Erro")
 
     def _on_search(self, *_):
+        self._render_current_view()
+
+    def _filtered_games(self) -> list[Game]:
         query = self._search_var.get().lower().strip()
         if not self.games:
-            return
+            return []
 
         filtered = (
             [g for g in self.games if query in g.title.lower()]
             if query else self.games
         )
+
+        mode = self._filter_var.get()
+        if mode == "Favoritos":
+            favorites = self._settings_service.get_favorite_games(self.emulator.id)
+            filtered = [g for g in filtered if g.id in favorites]
+            return sorted(filtered, key=lambda g: g.title.lower())
+
+        if mode == "Recentes":
+            filtered = [g for g in filtered if self._get_last_played(g) is not None]
+            return sorted(
+                filtered,
+                key=lambda g: self._get_last_played(g),
+                reverse=True,
+            )
+
+        return sorted(filtered, key=lambda g: g.title.lower())
+
+    def _render_current_view(self):
+        filtered = self._filtered_games()
         total = len(self.games)
         shown = len(filtered)
+        mode = self._filter_var.get()
+        query = self._search_var.get().lower().strip()
 
         self.lbl_count.config(
             text=(
                 f"{shown} de {total} jogo{'s' if total != 1 else ''}"
-                if query
+                if query or mode != "Todos"
                 else f"{total} jogo{'s' if total != 1 else ''}"
             )
         )
@@ -391,6 +452,12 @@ class InstalledGamesPage:
                 image_cache=self._image_cache,
                 frame_ref=self.frame,
                 stats_text=stats_text,
+                on_details=self._show_game_detail,
+                on_toggle_favorite=self._toggle_favorite,
+                is_favorite=self._settings_service.is_favorite_game(
+                    self.emulator.id,
+                    game.id,
+                ),
             )
             card.grid(
                 row=idx // cols, column=idx % cols,
@@ -466,7 +533,28 @@ class InstalledGamesPage:
 
     def _refresh_stats(self):
         if self.games:
-            self._render_grid(self.games)
+            self._render_current_view()
+
+    def _show_game_detail(self, game: Game):
+        if self.on_show_details:
+            self.on_show_details(game)
+
+    def _toggle_favorite(self, game: Game) -> bool:
+        is_favorite = self._settings_service.toggle_favorite_game(
+            self.emulator.id,
+            game.id,
+        )
+        Toast.show(
+            self.root,
+            f"{game.title}: {'favorito' if is_favorite else 'removido dos favoritos'}",
+            level="success" if is_favorite else "info",
+            duration=1800,
+        )
+
+        if self._filter_var.get() == "Favoritos":
+            self.frame.after(0, self._render_current_view)
+
+        return is_favorite
 
     def _on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
