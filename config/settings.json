@@ -2,11 +2,12 @@
   "roms_base_path": "roms",
   "last_selected_emulator": null,
   "cover_cache_enabled": true,
+  "graphics_profiles": {},
   "window_state": {
-    "width": 1920,
-    "height": 1057,
+    "width": 1280,
+    "height": 697,
     "x": -8,
-    "y": -1088,
+    "y": -8,
     "maximized": true
   }
 }
