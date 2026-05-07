@@ -15,6 +15,7 @@ from src.infrastructure.config.config_loader import ConfigLoader
 from src.infrastructure.config.config_validator import ConfigValidator
 from src.infrastructure.config.config_mapper import ConfigMapper
 from src.application.services.cover_service import CoverService
+from src.application.services.manual_cover_service import ManualCoverService
 from src.application.services.save_manager import SaveManager
 from src.application.services.settings_service import SettingsService
 from src.application.use_cases.scan_library import ScanLibraryUseCase
@@ -24,6 +25,7 @@ from src.infrastructure.adapters.covers.psp_extractor import PSPCoverExtractor
 from src.infrastructure.adapters.covers.gba_extractor import GBAScreenshotExtractor
 from src.infrastructure.adapters.covers.generated_extractor import GeneratedCoverExtractor
 from src.infrastructure.system.process_manager import SubprocessProcessManager
+from src.infrastructure.system.file_manager import FileManager
 from src.application.ports.process_manager import ProcessManager
 from src.infrastructure.adapters.graphics.profile_registry import GraphicsProfileRegistry
 from src.infrastructure.adapters.graphics.local_config_writer import LocalGraphicsConfigWriter
@@ -54,6 +56,8 @@ class Container:
         self._hardware_probe: Optional[HardwareProbe] = None
         self._graphics_config_writer: Optional[GraphicsConfigWriter] = None
         self._save_manager: Optional[SaveManager] = None
+        self._manual_cover_service: Optional[ManualCoverService] = None
+        self._file_manager: Optional[FileManager] = None
 
     @property
     def event_bus(self) -> EventBus:
@@ -129,6 +133,18 @@ class Container:
         if self._save_manager is None:
             self._save_manager = SaveManager()
         return self._save_manager
+
+    @property
+    def manual_cover_service(self) -> ManualCoverService:
+        if self._manual_cover_service is None:
+            self._manual_cover_service = ManualCoverService()
+        return self._manual_cover_service
+
+    @property
+    def file_manager(self) -> FileManager:
+        if self._file_manager is None:
+            self._file_manager = FileManager()
+        return self._file_manager
 
     @property
     def config_loader(self) -> ConfigLoader:

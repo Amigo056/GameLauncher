@@ -6,11 +6,13 @@ from typing import Callable
 
 from PIL import Image, ImageTk
 
+from src.application.services.manual_cover_service import ManualCoverService
 from src.application.services.save_manager import SaveManager, SaveSlot
 from src.application.services.session_tracker import SessionTracker
 from src.application.services.settings_service import SettingsService
 from src.domain.entities.emulator import Emulator
 from src.domain.entities.game import Game
+from src.infrastructure.system.file_manager import FileManager
 from src.domain.entities.play_session import PlaySession
 from src.presentation.theme import DARK_THEME, font, mono_font
 from src.presentation.widgets.toast import Toast
@@ -29,6 +31,8 @@ class GameDetailDialog:
         session_tracker: SessionTracker,
         save_manager: SaveManager,
         settings_service: SettingsService,
+        manual_cover_service: ManualCoverService,
+        file_manager: FileManager,
         on_play: Callable[[Game], None],
         on_favorite_changed: Callable[[Game, bool], None] | None = None,
     ):
@@ -38,6 +42,8 @@ class GameDetailDialog:
         self.session_tracker = session_tracker
         self.save_manager = save_manager
         self.settings_service = settings_service
+        self.manual_cover_service = manual_cover_service
+        self.file_manager = file_manager
         self.on_play = on_play
         self.on_favorite_changed = on_favorite_changed
 
@@ -164,6 +170,20 @@ class GameDetailDialog:
             command=self._toggle_favorite,
         )
         self._favorite_button.pack(fill='x')
+
+        tk.Button(
+            panel,
+            text="Capas",
+            bg=t.bg_tertiary,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            cursor='hand2',
+            width=22,
+            pady=6,
+            command=self._open_manual_covers_folder,
+        ).pack(fill='x', pady=(8, 0))
 
     def _build_stats_section(self, parent: tk.Widget):
         section = self._section(parent, "Estatisticas")
@@ -442,6 +462,24 @@ class GameDetailDialog:
             level="success",
             duration=2500,
         )
+
+    def _open_manual_covers_folder(self):
+        try:
+            folder = self.manual_cover_service.ensure_emulator_dir(self.emulator.id)
+            self.file_manager.open_folder(folder)
+            Toast.show(
+                self.root,
+                f"Pasta de capas: {folder}",
+                level="info",
+                duration=3500,
+            )
+        except Exception as exc:
+            Toast.show(
+                self.root,
+                f"Nao consegui abrir a pasta de capas: {exc}",
+                level="error",
+                duration=4500,
+            )
 
     def _restore_slot(self, slot: SaveSlot):
         confirmed = messagebox.askyesno(

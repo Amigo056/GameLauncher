@@ -275,12 +275,12 @@ Estado atual:
 - Historico recente de sessoes ja aparece no popup de detalhe.
 - Backups de saves ja podem ser restaurados/eliminados pela UI.
 - Capas manuais ja sao procuradas antes do cache em `assets/covers/manual`.
+- A UI ja tem atalho para abrir/criar a pasta de capas manuais do emulador.
 - Jogos sem capa real ja recebem uma capa fallback gerada por plataforma.
 - Icons NDS vazios/quase transparentes ja sao rejeitados para cair no fallback visual.
 
 Proximos passos desta fase:
 
-- Criar instrucoes simples/atalho de pasta para adicionar capas manuais.
 - Testar manualmente o popup com uma ROM real de GBA e NDS.
 
 ### Fase 2 - Controlos E Perfis Por Jogador

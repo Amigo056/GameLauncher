@@ -11,3 +11,9 @@ def test_app_navigator_imports_with_detail_dialog():
     from src.presentation.app_navigator import AppNavigator
 
     assert AppNavigator is not None
+
+
+def test_game_detail_dialog_imports():
+    from src.presentation.widgets.game_detail_dialog import GameDetailDialog
+
+    assert GameDetailDialog is not None

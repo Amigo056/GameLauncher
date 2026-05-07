@@ -103,6 +103,13 @@ class InstalledGamesPage:
             command=self._refresh,
         ).pack(side='right', padx=6)
 
+        tk.Button(
+            header, text="Capas",
+            font=font(t, "font_size_md"), bg=t.bg_card, fg=t.text_primary,
+            relief='flat', cursor='hand2',
+            command=self._open_manual_covers_folder,
+        ).pack(side='right', padx=6)
+
         if self.emulator.id == "mupen64plus":
             tk.Button(
                 header, text="🎮 Controlos",
@@ -608,6 +615,24 @@ class InstalledGamesPage:
     def _on_config_controller(self):
         if self.on_config_controller:
             self.on_config_controller(self.emulator.id)
+
+    def _open_manual_covers_folder(self):
+        try:
+            folder = container.manual_cover_service.ensure_emulator_dir(self.emulator.id)
+            container.file_manager.open_folder(folder)
+            Toast.show(
+                self.root,
+                f"Pasta de capas: {folder}",
+                level="info",
+                duration=3500,
+            )
+        except Exception as exc:
+            Toast.show(
+                self.root,
+                f"Nao consegui abrir a pasta de capas: {exc}",
+                level="error",
+                duration=4500,
+            )
 
     def destroy(self):
         self.canvas.unbind_all("<MouseWheel>")

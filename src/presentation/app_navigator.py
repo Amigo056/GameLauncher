@@ -149,6 +149,8 @@ class AppNavigator:
             session_tracker=container.session_tracker,
             save_manager=container.save_manager,
             settings_service=container.settings_service,
+            manual_cover_service=container.manual_cover_service,
+            file_manager=container.file_manager,
             on_play=games_page._on_play if games_page else lambda _game: None,
             on_favorite_changed=refresh_games_page,
         )
