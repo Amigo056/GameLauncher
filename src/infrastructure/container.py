@@ -2,8 +2,12 @@
 from pathlib import Path
 from typing import Optional
 
-from src.infrastructure.covers.fallback_extractor import FallbackCoverExtractor
-from src.application.events import EventBus
+from src.infrastructure.adapters.covers.fallback_extractor import FallbackCoverExtractor
+from src.application.events import EventBus, event_bus
+from src.application.use_cases.launch_game import LaunchGameUseCase
+from src.application.use_cases.analyze_hardware import AnalyzeHardwareUseCase
+from src.application.use_cases.apply_graphics_profile import ApplyGraphicsProfileUseCase
+from src.application.use_cases.recommend_emulators import RecommendEmulatorsUseCase
 from src.infrastructure.persistence.local_game_repo import LocalGameRepository
 from src.infrastructure.persistence.session_repo import SQLiteSessionRepository
 from src.infrastructure.cache.cover_cache import CoverCache
@@ -13,10 +17,19 @@ from src.infrastructure.config.config_mapper import ConfigMapper
 from src.application.services.cover_service import CoverService
 from src.application.services.settings_service import SettingsService
 from src.application.use_cases.scan_library import ScanLibraryUseCase
-from src.application.tracking.session_tracker import SessionTracker
-from src.infrastructure.covers.nds_extractor import NDSCoverExtractor
-from src.infrastructure.covers.psp_extractor import PSPCoverExtractor
-from src.infrastructure.covers.gba_extractor import GBAScreenshotExtractor
+from src.application.services.session_tracker import SessionTracker
+from src.infrastructure.adapters.covers.nds_extractor import NDSCoverExtractor
+from src.infrastructure.adapters.covers.psp_extractor import PSPCoverExtractor
+from src.infrastructure.adapters.covers.gba_extractor import GBAScreenshotExtractor
+from src.infrastructure.system.process_manager import SubprocessProcessManager
+from src.application.ports.process_manager import ProcessManager
+from src.infrastructure.adapters.graphics.profile_registry import GraphicsProfileRegistry
+from src.infrastructure.adapters.graphics.local_config_writer import LocalGraphicsConfigWriter
+from src.infrastructure.adapters.graphics.noop_config_writer import NoopGraphicsConfigWriter
+from src.infrastructure.adapters.hardware.local_hardware_probe import LocalHardwareProbe
+from src.application.ports.hardware_probe import HardwareProbe
+from src.application.ports.graphics_config_writer import GraphicsConfigWriter
+from src.domain.value_objects.emulator_recommendation import PerformanceTier
 
 
 class Container:
@@ -27,6 +40,7 @@ class Container:
         self._session_repo: Optional[SQLiteSessionRepository] = None
         self._cover_service: Optional[CoverService] = None
         self._event_bus: Optional[EventBus] = None
+        self._process_manager: Optional[ProcessManager] = None
         self._session_tracker: Optional[SessionTracker] = None
         self._settings_service: Optional[SettingsService] = None
         self._config_loader: Optional[ConfigLoader] = None
@@ -34,12 +48,21 @@ class Container:
         self._config_mapper: Optional[ConfigMapper] = None
         self._cover_cache: Optional[CoverCache] = None
         self._mgba_path: Optional[Path] = None
+        self._graphics_profile_registry: Optional[GraphicsProfileRegistry] = None
+        self._hardware_probe: Optional[HardwareProbe] = None
+        self._graphics_config_writer: Optional[GraphicsConfigWriter] = None
 
     @property
     def event_bus(self) -> EventBus:
         if self._event_bus is None:
-            self._event_bus = EventBus()
+            self._event_bus = event_bus
         return self._event_bus
+
+    @property
+    def process_manager(self) -> ProcessManager:
+        if self._process_manager is None:
+            self._process_manager = SubprocessProcessManager()
+        return self._process_manager
 
     @property
     def game_repo(self) -> LocalGameRepository:
@@ -115,6 +138,26 @@ class Container:
             self._config_mapper = ConfigMapper()
         return self._config_mapper
 
+    @property
+    def graphics_profile_registry(self) -> GraphicsProfileRegistry:
+        if self._graphics_profile_registry is None:
+            self._graphics_profile_registry = GraphicsProfileRegistry()
+        return self._graphics_profile_registry
+
+    @property
+    def hardware_probe(self) -> HardwareProbe:
+        if self._hardware_probe is None:
+            self._hardware_probe = LocalHardwareProbe()
+        return self._hardware_probe
+
+    @property
+    def graphics_config_writer(self) -> GraphicsConfigWriter:
+        if self._graphics_config_writer is None:
+            self._graphics_config_writer = LocalGraphicsConfigWriter(
+                fallback=NoopGraphicsConfigWriter()
+            )
+        return self._graphics_config_writer
+
     def _resolve_mgba_path(self) -> Optional[Path]:
         if self._mgba_path is None:
             try:
@@ -130,6 +173,30 @@ class Container:
         return ScanLibraryUseCase(
             game_repo=self.game_repo,
             cover_service=self.cover_service,
+        )
+
+    def create_launch_use_case(self) -> LaunchGameUseCase:
+        return LaunchGameUseCase(
+            process_manager=self.process_manager,
+            events=self.event_bus,
+        )
+
+    def create_analyze_hardware_use_case(self) -> AnalyzeHardwareUseCase:
+        return AnalyzeHardwareUseCase(hardware_probe=self.hardware_probe)
+
+    def create_recommend_emulators_use_case(self) -> RecommendEmulatorsUseCase:
+        return RecommendEmulatorsUseCase(
+            emulator_tiers={
+                "mgba": PerformanceTier.VERY_LIGHT,
+                "melonds": PerformanceTier.LIGHT,
+                "mupen64plus": PerformanceTier.MEDIUM,
+                "ppsspp": PerformanceTier.MEDIUM,
+            }
+        )
+
+    def create_apply_graphics_profile_use_case(self) -> ApplyGraphicsProfileUseCase:
+        return ApplyGraphicsProfileUseCase(
+            graphics_writer=self.graphics_config_writer,
         )
 
     def initialize_tracking(self):

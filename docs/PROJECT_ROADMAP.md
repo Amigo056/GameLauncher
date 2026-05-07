@@ -36,7 +36,6 @@ src/
   domain/
     entities/
     value_objects/
-    services/
     exceptions.py
 
   application/

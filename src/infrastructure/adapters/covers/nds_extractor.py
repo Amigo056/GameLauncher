@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 from PIL import Image
 
 from src.domain.entities.game import Cover
-from src.domain.services.cover_extractor import CoverExtractor
+from src.application.ports.cover_extractor import CoverExtractor
 
 
 class NDSCoverExtractor(CoverExtractor):
@@ -58,13 +58,17 @@ class NDSCoverExtractor(CoverExtractor):
                 if file_size < 0x200:
                     return False
 
-                # Ler o pointer para o banner
-                f.seek(self.BANNER_OFFSET_LOC)
-                raw = f.read(4)
-                if len(raw) < 4:
+                # Ler o header necessario de uma vez. Isto tambem torna o
+                # metodo mais simples de testar sem depender de seek mocking.
+                f.seek(0)
+                header = f.read(self.BANNER_OFFSET_LOC + 4)
+                if len(header) < self.BANNER_OFFSET_LOC + 4:
                     return False
 
-                banner_offset = struct.unpack("<I", raw)[0]
+                banner_offset = struct.unpack(
+                    "<I",
+                    header[self.BANNER_OFFSET_LOC : self.BANNER_OFFSET_LOC + 4],
+                )[0]
 
                 # Banner offset tem de existir e caber dentro do ficheiro
                 return 0 < banner_offset < (file_size - self.BANNER_SIZE_V1)
@@ -149,6 +153,7 @@ class NDSCoverExtractor(CoverExtractor):
         independentemente do valor armazenado.
         """
         palette: list[tuple] = []
+        palette_data = palette_data[:32]
         for idx, offset in enumerate(range(0, len(palette_data), 2)):
             if offset + 1 >= len(palette_data):
                 break

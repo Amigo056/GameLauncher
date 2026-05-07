@@ -1,8 +1,10 @@
 # src/application/services/settings_service.py
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
+
+from src.domain.value_objects.graphics_profile import GraphicsProfileLevel
 
 
 @dataclass
@@ -20,6 +22,7 @@ class AppSettings:
     last_selected_emulator: Optional[str] = None
     window_state: WindowState = field(default_factory=WindowState)
     cover_cache_enabled: bool = True
+    graphics_profiles: dict[str, str] = field(default_factory=dict)
 
 
 class SettingsService:
@@ -53,6 +56,7 @@ class SettingsService:
                 last_selected_emulator=data.get("last_selected_emulator"),
                 window_state=window_state,
                 cover_cache_enabled=data.get("cover_cache_enabled", True),
+                graphics_profiles=data.get("graphics_profiles", {}),
             )
 
         except Exception as e:
@@ -67,6 +71,7 @@ class SettingsService:
             "roms_base_path": settings.roms_base_path,
             "last_selected_emulator": settings.last_selected_emulator,
             "cover_cache_enabled": settings.cover_cache_enabled,
+            "graphics_profiles": settings.graphics_profiles,
             "window_state": {
                 "width": settings.window_state.width,
                 "height": settings.window_state.height,
@@ -102,3 +107,26 @@ class SettingsService:
             root.state('zoomed')
         else:
             root.geometry(f"{ws.width}x{ws.height}+{ws.x}+{ws.y}")
+
+    def get_graphics_profile(
+        self,
+        emulator_id: str,
+        default: GraphicsProfileLevel = GraphicsProfileLevel.BALANCED,
+    ) -> GraphicsProfileLevel:
+        """Retorna o perfil grafico escolhido para um emulador."""
+        settings = self.load()
+        raw = settings.graphics_profiles.get(emulator_id, default.value)
+        try:
+            return GraphicsProfileLevel(raw)
+        except ValueError:
+            return default
+
+    def save_graphics_profile(
+        self,
+        emulator_id: str,
+        level: GraphicsProfileLevel,
+    ) -> None:
+        """Guarda o perfil grafico escolhido para um emulador."""
+        settings = self.load()
+        settings.graphics_profiles[emulator_id] = level.value
+        self.save(settings)

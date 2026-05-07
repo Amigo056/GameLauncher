@@ -2,6 +2,7 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 from concurrent.futures import ThreadPoolExecutor
+import threading
 import time
 
 import pytest
@@ -17,11 +18,22 @@ class MockCoverService:
     def __init__(self, delay: float = 0.01):
         self.delay = delay
         self.call_count = 0
+        self.active_calls = 0
+        self.max_concurrent_calls = 0
+        self._lock = threading.Lock()
     
     def resolve_cover(self, rom_path: Path, game_id: str, emulator_id: str):
-        self.call_count += 1
-        time.sleep(self.delay)  # Simula I/O
-        return Cover(local_path=Path(f"covers/{game_id}.png")), f"Real {game_id}"
+        with self._lock:
+            self.call_count += 1
+            self.active_calls += 1
+            self.max_concurrent_calls = max(self.max_concurrent_calls, self.active_calls)
+
+        try:
+            time.sleep(self.delay)  # Simula I/O
+            return Cover(local_path=Path(f"covers/{game_id}.png")), f"Real {game_id}"
+        finally:
+            with self._lock:
+                self.active_calls -= 1
 
 
 class MockGameRepository:
@@ -88,15 +100,11 @@ class TestScanLibraryParallel:
         
         use_case = ScanLibraryUseCase(repo, cover_service)
         
-        start = time.time()
         result = use_case.execute(emulator)
-        elapsed = time.time() - start
         
         assert len(result) == 10
         assert cover_service.call_count == 10
-        # Paralelo com 4 workers: ~0.03s (3 chunks de 4, 4, 2)
-        # Deve ser significativamente mais rápido que sequencial (0.1s)
-        assert elapsed < 0.08, f"Scan paralelo demorou {elapsed:.3f}s, esperado < 0.08s"
+        assert cover_service.max_concurrent_calls > 1
 
     def test_progress_callback_called(self, emulator, mock_games):
         """O callback de progresso deve ser chamado durante o scan."""

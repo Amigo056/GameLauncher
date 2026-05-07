@@ -42,7 +42,7 @@ class TestLocalGameRepository:
     def test_filename_to_id(self, repo):
         """Deve converter nomes para slugs."""
         assert repo._filename_to_id("Super Mario Bros") == "super-mario-bros"
-        assert repo._filename_to_id("Pokémon Red") == "pokmon-red"
+        assert repo._filename_to_id("Pokémon Red") == "pokemon-red"
         assert repo._filename_to_id("Game (USA)") == "game-usa"
 
     def test_detect_region_usa(self, repo):

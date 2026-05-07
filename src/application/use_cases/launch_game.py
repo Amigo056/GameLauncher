@@ -3,10 +3,10 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from src.application.protocols.process_manager import ProcessManager
-from src.domain.entities.game import Game
+from src.application.events import EventBus, event_bus, GameLaunched, GameClosed
+from src.application.ports.process_manager import ProcessManager
 from src.domain.entities.emulator import Emulator
-from src.application.events import event_bus, GameLaunched, GameClosed
+from src.domain.entities.game import Game
 
 @dataclass
 class LaunchResult:
@@ -27,8 +27,13 @@ class LaunchGameUseCase:
     5. (Opcional) Monitora fechamento
     """
 
-    def __init__(self, process_manager: ProcessManager):
+    def __init__(
+        self,
+        process_manager: ProcessManager,
+        events: Optional[EventBus] = None,
+    ):
         self.process_manager = process_manager
+        self.event_bus = events or event_bus
 
     def execute(
         self,
@@ -66,7 +71,6 @@ class LaunchGameUseCase:
         # Construir comando
         try:
             command = emulator.build_launch_command(game.rom.file_path)
-            print(f"[DEBUG] Comando: {command}") 
         except Exception as e:
             return LaunchResult(
                 success=False,
@@ -78,7 +82,7 @@ class LaunchGameUseCase:
             pid = self.process_manager.launch(command)
             start_time = time.time()
 
-            event_bus.emit(GameLaunched(
+            self.event_bus.emit(GameLaunched(
                 game_id=game.id,
                 emulator_id=emulator.id,
                 rom_path=game.rom.file_path,
@@ -93,7 +97,7 @@ class LaunchGameUseCase:
             self.process_manager.wait_for_close(pid)
             duration = time.time() - start_time
 
-            event_bus.emit(GameClosed(
+            self.event_bus.emit(GameClosed(
                 game_id=game.id,
                 emulator_id=emulator.id,
                 session_duration=duration
@@ -126,12 +130,15 @@ class LaunchGameUseCase:
         if result.success and on_close:
             # Inicia thread de monitoramento não-bloqueante
             import threading
+            start_time = time.time()
+
             def monitor():
                 self.process_manager.wait_for_close(result.pid)
-                event_bus.emit(GameClosed(
+                duration = time.time() - start_time
+                self.event_bus.emit(GameClosed(
                     game_id=game.id,
                     emulator_id=emulator.id,
-                    session_duration=0  # Calcular corretamente
+                    session_duration=duration
                 ))
                 on_close(game.id)
 

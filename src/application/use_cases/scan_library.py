@@ -5,7 +5,7 @@ from typing import List, Optional, Callable
 
 from src.domain.entities.game import Game
 from src.domain.entities.emulator import Emulator
-from src.domain.repositories.game_repository import GameRepository
+from src.application.ports.game_repository import GameRepository
 from src.application.services.cover_service import CoverService
 
 

@@ -4,7 +4,7 @@ Este módulo é o "glue" que permite tracking automático de tempo de jogo.
 Subscreve-se aos eventos GameLaunched e GameClosed e persiste as sessões.
 """
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -64,8 +64,9 @@ class SessionTracker:
 
     def stop(self):
         """Remove subscrições do EventBus."""
-        # Nota: O EventBus atual não suporta unsubscribe,
-        # mas guardamos estado para ignorar eventos futuros
+        if self.event_bus:
+            self.event_bus.unsubscribe(GameLaunched, self._on_game_launched)
+            self.event_bus.unsubscribe(GameClosed, self._on_game_closed)
         self._is_started = False
         print("[SessionTracker] Subscrições desativadas")
 
@@ -98,14 +99,17 @@ class SessionTracker:
         play_session = PlaySession(
             game_id=event.game_id,
             emulator_id=event.emulator_id,
-            start_time=active.start_time,
-            end_time=end_time,
+            started_at=active.start_time,
+            ended_at=end_time,
             duration_seconds=int(duration) if duration > 0 else None,
             rom_path=active.rom_path,
         )
 
         try:
-            self.session_repo.save(play_session)
+            if hasattr(self.session_repo, "record_session"):
+                self.session_repo.record_session(play_session)
+            else:
+                self.session_repo.save(play_session)
             print(
                 f"[SessionTracker] Sessão guardada: {event.game_id} "
                 f"({duration:.0f}s)"
@@ -117,17 +121,27 @@ class SessionTracker:
 
     def get_total_playtime(self, game_id: str) -> str:
         """Retorna tempo total formatado (ex: '2h 15m')."""
-        seconds = self.session_repo.get_total_playtime(game_id)
+        total = self.session_repo.get_total_playtime(game_id)
+        seconds = int(total.total_seconds()) if isinstance(total, timedelta) else int(total)
         return self._format_duration(seconds)
 
     def get_session_count(self, game_id: str) -> int:
         """Retorna número de sessões de um jogo."""
+        if hasattr(self.session_repo, "get_session_count"):
+            return self.session_repo.get_session_count(game_id)
         return len(self.session_repo.get_by_game(game_id))
 
     def get_most_played(self, limit: int = 5) -> list[tuple[str, str]]:
         """Retorna jogos mais jogados (game_id, tempo_formatado)."""
         rows = self.session_repo.get_most_played(limit)
-        return [(gid, self._format_duration(seconds)) for gid, seconds in rows]
+        result: list[tuple[str, str]] = []
+        for row in rows:
+            if hasattr(row, "game_id"):
+                result.append((row.game_id, self._format_duration(int(row.total_playtime_seconds))))
+            else:
+                gid, seconds = row
+                result.append((gid, self._format_duration(int(seconds))))
+        return result
 
     def get_recent_sessions(self, limit: int = 5) -> list[PlaySession]:
         """Retorna sessões recentes."""

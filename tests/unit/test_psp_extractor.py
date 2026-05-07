@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.infrastructure.covers.psp_extractor import PSPCoverExtractor
+from src.infrastructure.adapters.covers.psp_extractor import PSPCoverExtractor
 
 class TestPSPCoverExtractor:
     """Testes para extração de covers PSP."""
@@ -41,23 +41,23 @@ class TestPSPCoverExtractor:
     def test_parse_sfo_title_valid(self, extractor):
         """Deve extrair título de PARAM.SFO válido."""
         # SFO mínimo válido
-        data = b'\\x00PSF'  # magic
-        data += b'\\x00' * 4  # version
-        data += struct.pack('<I', 32)   # key_table_start
-        data += struct.pack('<I', 64)   # data_table_start
+        data = b'\x00PSF'  # magic
+        data += b'\x00' * 4  # version
+        data += struct.pack('<I', 36)   # key_table_start
+        data += struct.pack('<I', 48)   # data_table_start
         data += struct.pack('<I', 1)    # index_entries
         
         # Entry
         data += struct.pack('<H', 0)    # key_offset
-        data += b'\\x00' * 10           # padding
+        data += b'\x00' * 10            # padding
         data += struct.pack('<I', 0)    # val_offset
         
         # Key table
-        data += b'TITLE\\x00'
-        data += b'\\x00' * 10
+        data += b'TITLE\x00'
+        data += b'\x00' * 6
         
         # Data table
-        data += b'My Game Title\\x00'
+        data += b'My Game Title\x00'
         
         title = extractor._parse_sfo_title(data)
         assert title == "My Game Title"

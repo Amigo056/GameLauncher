@@ -5,7 +5,10 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from src.infrastructure.input.sdl_to_n64_mapper import N64ControllerProfile, SDLToN64Mapper
+from src.infrastructure.adapters.controllers.sdl_to_n64_mapper import (
+    N64ControllerProfile,
+    SDLToN64Mapper,
+)
 
 
 class ProfileManager:
@@ -73,7 +76,7 @@ class ProfileManager:
     def load_profile(self, emulator_id: str, profile_name: str) -> Optional[N64ControllerProfile]:
         """Carrega perfil de JSON."""
         import json
-        from src.infrastructure.input.sdl_to_n64_mapper import SDLMapping
+        from src.infrastructure.adapters.controllers.sdl_to_n64_mapper import SDLMapping
         
         path = self.get_profile_path(emulator_id, profile_name)
         if not path.exists():

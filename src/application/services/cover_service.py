@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 
 from src.infrastructure.cache.cover_cache import CoverCache
 from src.domain.entities.game import Cover
-from src.domain.services.cover_extractor import CoverExtractor
+from src.application.ports.cover_extractor import CoverExtractor
 
 
 class CoverService:

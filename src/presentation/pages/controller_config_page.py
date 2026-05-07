@@ -2,9 +2,12 @@ import time
 import tkinter as tk
 from typing import Callable
 
-from src.infrastructure.input.controller_detector import ControllerDetector
-from src.infrastructure.input.sdl_to_n64_mapper import SDLToN64Mapper, N64ControllerProfile
-from src.infrastructure.input.profile_manager import ProfileManager
+from src.infrastructure.adapters.controllers.controller_detector import ControllerDetector
+from src.infrastructure.adapters.controllers.sdl_to_n64_mapper import (
+    N64ControllerProfile,
+    SDLToN64Mapper,
+)
+from src.infrastructure.adapters.controllers.profile_manager import ProfileManager
 from src.presentation.widgets.toast import Toast
 from src.presentation.theme import DARK_THEME, font, mono_font
 
@@ -197,7 +200,7 @@ class ControllerConfigPage:
 
     def _apply_ps4(self):
         """Aplica perfil PS4."""
-        from src.infrastructure.input.controller_detector import ControllerInfo
+        from src.infrastructure.adapters.controllers.controller_detector import ControllerInfo
         info = ControllerInfo(
             guid="", name="PS4 Controller",
             vendor_id="", product_id="", is_gamecontroller=True
@@ -208,7 +211,7 @@ class ControllerConfigPage:
 
     def _apply_xbox(self):
         """Aplica perfil Xbox."""
-        from src.infrastructure.input.controller_detector import ControllerInfo
+        from src.infrastructure.adapters.controllers.controller_detector import ControllerInfo
         info = ControllerInfo(
             guid="", name="Xbox Controller",
             vendor_id="", product_id="", is_gamecontroller=True
@@ -219,7 +222,7 @@ class ControllerConfigPage:
 
     def _apply_switch(self):
         """Aplica perfil Switch."""
-        from src.infrastructure.input.controller_detector import ControllerInfo
+        from src.infrastructure.adapters.controllers.controller_detector import ControllerInfo
         info = ControllerInfo(
             guid="", name="Switch Pro Controller",
             vendor_id="", product_id="", is_gamecontroller=True
@@ -230,7 +233,7 @@ class ControllerConfigPage:
 
     def _apply_generic(self):
         """Aplica perfil genérico."""
-        from src.infrastructure.input.controller_detector import ControllerInfo
+        from src.infrastructure.adapters.controllers.controller_detector import ControllerInfo
         info = ControllerInfo(
             guid="", name="Generic Controller",
             vendor_id="", product_id="", is_gamecontroller=True

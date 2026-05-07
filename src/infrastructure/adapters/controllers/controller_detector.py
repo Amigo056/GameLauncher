@@ -64,6 +64,7 @@ class ControllerDetector:
     
     def _list_via_pygame(self) -> List[ControllerInfo]:
         """Fallback usando pygame (requer instalação)."""
+        pygame = None
         try:
             import pygame
             pygame.init()
@@ -84,4 +85,5 @@ class ControllerDetector:
         except ImportError:
             return []
         finally:
-            pygame.quit()
+            if pygame:
+                pygame.quit()

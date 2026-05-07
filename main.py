@@ -14,7 +14,7 @@ def ensure_directories():
         "assets/covers", "assets/icons",
         "roms/NDS", "roms/PSP", 
         "roms/N64", "roms/GBA",
-        "logs",
+        "logs", "data", "saves/slots",
     ]
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
@@ -29,9 +29,11 @@ def main():
 
     from src.presentation.app_navigator import AppNavigator
     from src.application.services.settings_service import SettingsService
+    from src.infrastructure.container import container
     from src.presentation.theme import DARK_THEME
 
     settings_service = SettingsService()
+    container.initialize_tracking()
 
     root = tk.Tk()
     root.title("GameLauncher")
@@ -58,8 +60,4 @@ def main():
 
 
 if __name__ == "__main__":
-    from src.domain.entities.emulator import load_emulator_from_json
-    emu = load_emulator_from_json("mgba")
-    print(f"mGBA path: {emu.executable_path if emu else 'NÃO ENCONTRADO'}")
-    print(f"mGBA installed: {emu.is_installed if emu else False}")
     main()

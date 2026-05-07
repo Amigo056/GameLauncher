@@ -1,9 +1,9 @@
 """Cache persistente de covers com TTL."""
 import json
-import hashlib
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
+from threading import RLock
 from typing import Optional, Dict, Any
 
 from src.domain.entities.game import Cover
@@ -37,6 +37,7 @@ class CoverCache:
         self.cache_file = Path(cache_file) if cache_file else self.CACHE_FILE
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
         self._data: Dict[str, Any] = {}
+        self._lock = RLock()
         self._load()
 
     def _load(self):
@@ -74,34 +75,35 @@ class CoverCache:
         Returns:
             Cover se válida, None caso contrário
         """
-        key = self._make_key(game_id, emulator_id)
-        entry = self._data.get(key)
-        
-        if not entry:
-            return None
-        
-        # Verificar TTL
-        created = datetime.fromisoformat(entry['created_at'])
-        ttl = timedelta(seconds=entry.get('ttl_seconds', self.DEFAULT_TTL_DAYS * 86400))
-        if datetime.now() - created > ttl:
-            del self._data[key]
-            self._save()
-            return None
-        
-        # Verificar se ROM mudou
-        if entry.get('rom_checksum') != rom_checksum:
-            del self._data[key]
-            self._save()
-            return None
-        
-        # Verificar se ficheiro existe
-        cover_path = Path(entry['cover_path'])
-        if not cover_path.exists():
-            del self._data[key]
-            self._save()
-            return None
-        
-        return Cover(local_path=cover_path)
+        with self._lock:
+            key = self._make_key(game_id, emulator_id)
+            entry = self._data.get(key)
+
+            if not entry:
+                return None
+
+            # Verificar TTL
+            created = datetime.fromisoformat(entry['created_at'])
+            ttl = timedelta(seconds=entry.get('ttl_seconds', self.DEFAULT_TTL_DAYS * 86400))
+            if datetime.now() - created > ttl:
+                del self._data[key]
+                self._save()
+                return None
+
+            # Verificar se ROM mudou
+            if entry.get('rom_checksum') != rom_checksum:
+                del self._data[key]
+                self._save()
+                return None
+
+            # Verificar se ficheiro existe
+            cover_path = Path(entry['cover_path'])
+            if not cover_path.exists():
+                del self._data[key]
+                self._save()
+                return None
+
+            return Cover(local_path=cover_path)
 
     def put(
         self,
@@ -124,23 +126,25 @@ class CoverCache:
         if not cover.local_path:
             return
         
-        key = self._make_key(game_id, emulator_id)
-        self._data[key] = {
-            'game_id': game_id,
-            'emulator_id': emulator_id,
-            'cover_path': str(cover.local_path),
-            'rom_checksum': rom_checksum,
-            'created_at': datetime.now().isoformat(),
-            'ttl_seconds': (ttl_days or self.DEFAULT_TTL_DAYS) * 86400,
-        }
-        self._save()
+        with self._lock:
+            key = self._make_key(game_id, emulator_id)
+            self._data[key] = {
+                'game_id': game_id,
+                'emulator_id': emulator_id,
+                'cover_path': str(cover.local_path),
+                'rom_checksum': rom_checksum,
+                'created_at': datetime.now().isoformat(),
+                'ttl_seconds': (ttl_days or self.DEFAULT_TTL_DAYS) * 86400,
+            }
+            self._save()
 
     def invalidate(self, game_id: str, emulator_id: str):
         """Remove entrada específica do cache."""
-        key = self._make_key(game_id, emulator_id)
-        if key in self._data:
-            del self._data[key]
-            self._save()
+        with self._lock:
+            key = self._make_key(game_id, emulator_id)
+            if key in self._data:
+                del self._data[key]
+                self._save()
 
     def invalidate_all(self, emulator_id: Optional[str] = None):
         """
@@ -149,16 +153,17 @@ class CoverCache:
         Args:
             emulator_id: Se especificado, só invalida desse emulador
         """
-        if emulator_id:
-            keys_to_remove = [
-                k for k in self._data.keys()
-                if k.startswith(f"{emulator_id}:")
-            ]
-            for key in keys_to_remove:
-                del self._data[key]
-        else:
-            self._data.clear()
-        self._save()
+        with self._lock:
+            if emulator_id:
+                keys_to_remove = [
+                    k for k in self._data.keys()
+                    if k.startswith(f"{emulator_id}:")
+                ]
+                for key in keys_to_remove:
+                    del self._data[key]
+            else:
+                self._data.clear()
+            self._save()
 
     def cleanup(self) -> int:
         """
@@ -167,82 +172,28 @@ class CoverCache:
         Returns:
             Número de entradas removidas
         """
-        removed = 0
-        now = datetime.now()
-        
-        keys = list(self._data.keys())
-        for key in keys:
-            entry = self._data[key]
-            
-            # TTL expirado
-            created = datetime.fromisoformat(entry['created_at'])
-            ttl = timedelta(seconds=entry.get('ttl_seconds', self.DEFAULT_TTL_DAYS * 86400))
-            if now - created > ttl:
-                del self._data[key]
-                removed += 1
-                continue
-            
-            # Ficheiro não existe
-            if not Path(entry['cover_path']).exists():
-                del self._data[key]
-                removed += 1
-        
-        if removed > 0:
-            self._save()
-        
-        return removed
-'''
+        with self._lock:
+            removed = 0
+            now = datetime.now()
 
-cache_invalidator_py = '''"""Invalidador automático de cache baseado em eventos."""
-from pathlib import Path
-from typing import Callable, Optional
+            keys = list(self._data.keys())
+            for key in keys:
+                entry = self._data[key]
 
-from src.application.events import event_bus, GameLaunched, GameClosed
-from src.infrastructure.cache.cover_cache import CoverCache
+                # TTL expirado
+                created = datetime.fromisoformat(entry['created_at'])
+                ttl = timedelta(seconds=entry.get('ttl_seconds', self.DEFAULT_TTL_DAYS * 86400))
+                if now - created > ttl:
+                    del self._data[key]
+                    removed += 1
+                    continue
 
+                # Ficheiro não existe
+                if not Path(entry['cover_path']).exists():
+                    del self._data[key]
+                    removed += 1
 
-class CacheInvalidator:
-    """
-    Invalida cache automaticamente quando eventos relevantes ocorrem.
-    
-    Subscreve no EventBus para:
-    - Invalidar cache quando ROM é modificada
-    - Limpar entradas antigas periodicamente
-    """
+            if removed > 0:
+                self._save()
 
-    def __init__(self, cover_cache: Optional[CoverCache] = None):
-        self.cover_cache = cover_cache or CoverCache()
-        self._subscribed = False
-
-    def start_listening(self):
-        """Inicia subscrição no EventBus."""
-        if self._subscribed:
-            return
-        
-        event_bus.subscribe(GameLaunched, self._on_game_launched)
-        event_bus.subscribe(GameClosed, self._on_game_closed)
-        self._subscribed = True
-
-    def stop_listening(self):
-        """Para subscrição no EventBus."""
-        if not self._subscribed:
-            return
-        
-        event_bus.unsubscribe(GameLaunched, self._on_game_launched)
-        event_bus.unsubscribe(GameClosed, self._on_game_closed)
-        self._subscribed = False
-
-    def _on_game_launched(self, event: GameLaunched):
-        """Nada a fazer no lançamento."""
-        pass
-
-    def _on_game_closed(self, event: GameClosed):
-        """Após fechar jogo, verificar se ROM foi modificada."""
-        # Futuro: verificar se save alterou ROM e invalidar se necessário
-        pass
-
-    def periodic_cleanup(self):
-        """Executa limpeza periódica do cache."""
-        removed = self.cover_cache.cleanup()
-        if removed > 0:
-            print(f"[Cache] {removed} entradas órfãs/expiradas removidas")
+            return removed

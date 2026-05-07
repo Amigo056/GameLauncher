@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from src.domain.entities.game import Cover
-from src.domain.services.cover_extractor import CoverExtractor
+from src.application.ports.cover_extractor import CoverExtractor
 
 
 class PSPCoverExtractor(CoverExtractor):

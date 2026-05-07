@@ -71,7 +71,7 @@ class Emulator:
 
     def build_launch_command(self, rom_path: Path) -> str:
         """Constrói comando de lançamento completo."""
-        if not self.is_installed:
+        if self.executable_path is None:
             raise RuntimeError(f"Emulador {self.name} não está instalado")
         
         if not rom_path.exists():
@@ -87,6 +87,11 @@ class Emulator:
             rom_path=rom_str,
             emulator_dir=emulator_dir
         )
+
+        if self.id == "mgba" and self.save_dir:
+            save_dir = str(self.save_dir.resolve()).replace('"', '\\"')
+            args = f'--savedir "{save_dir}" {args}'
+
         if self.id == "mupen64plus":
             screen_w, screen_h = self._get_screen_resolution()
             resolution_arg = f"--resolution {screen_w}x{screen_h}"

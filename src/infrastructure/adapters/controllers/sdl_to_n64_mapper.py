@@ -5,7 +5,7 @@ from typing import Dict, Optional
 from pathlib import Path
 import json
 
-from src.infrastructure.input.controller_detector import ControllerInfo
+from src.infrastructure.adapters.controllers.controller_detector import ControllerInfo
 
 
 @dataclass

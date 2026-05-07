@@ -96,6 +96,34 @@ class SQLiteSessionRepository:
             conn.commit()
             return cursor.lastrowid
 
+    def save(self, session: PlaySession) -> int:
+        """Alias de compatibilidade para gravar uma sessao."""
+        return self.record_session(session)
+
+    def get_by_game(self, game_id: str) -> List[PlaySession]:
+        """Retorna todas as sessoes de um jogo."""
+        with self._get_connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT game_id, emulator_id, started_at, ended_at, duration_seconds
+                FROM play_sessions
+                WHERE game_id = ?
+                ORDER BY started_at DESC
+                """,
+                (game_id,),
+            ).fetchall()
+
+            return [
+                PlaySession(
+                    game_id=row["game_id"],
+                    emulator_id=row["emulator_id"],
+                    started_at=datetime.fromisoformat(row["started_at"]),
+                    ended_at=datetime.fromisoformat(row["ended_at"]) if row["ended_at"] else None,
+                    duration_seconds=row["duration_seconds"],
+                )
+                for row in rows
+            ]
+
     def get_total_playtime(self, game_id: str) -> timedelta:
         """
         Retorna tempo total de jogo para um jogo.

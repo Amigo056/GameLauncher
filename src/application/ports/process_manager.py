@@ -1,13 +1,13 @@
+"""Porta para gestao de processos do sistema."""
+
 from typing import Optional, Protocol
 
 
 class ProcessManager(Protocol):
-    """
-    Protocolo para gerenciamento de processos.
-    Implementação: infrastructure/system/process_manager.py
-    """
+    """Contrato para lancar e monitorizar processos externos."""
+
     def launch(self, command: str) -> int:
-        """Lança processo e retorna PID."""
+        """Lanca processo e retorna PID."""
         ...
 
     def is_running(self, pid: int) -> bool:

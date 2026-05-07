@@ -22,7 +22,7 @@ from typing import Optional, Tuple
 from PIL import Image, ImageGrab
 
 from src.domain.entities.game import Cover
-from src.domain.services.cover_extractor import CoverExtractor
+from src.application.ports.cover_extractor import CoverExtractor
 
 
 class GBAScreenshotExtractor(CoverExtractor):

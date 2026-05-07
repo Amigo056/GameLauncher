@@ -8,7 +8,7 @@ import pytest
 
 from src.application.events import EventBus, GameLaunched, GameClosed
 from src.domain.entities.play_session import PlaySession
-from src.application.tracking.session_tracker import SessionTracker, _ActiveSession
+from src.application.services.session_tracker import SessionTracker, _ActiveSession
 
 
 class MockSessionRepository:

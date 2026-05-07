@@ -1,13 +1,14 @@
 """Implementação concreta: Repositório de jogos locais (filesystem)."""
 import hashlib
 import re
+import unicodedata
 from pathlib import Path
 from typing import List, Optional, Dict
 from datetime import datetime
 
 from src.domain.entities.game import Game, Rom, Region
 from src.domain.entities.emulator import Emulator
-from src.domain.repositories.game_repository import GameRepository, RomNotFoundError
+from src.application.ports.game_repository import GameRepository, RomNotFoundError
 
 
 class LocalGameRepository(GameRepository):
@@ -136,6 +137,8 @@ class LocalGameRepository(GameRepository):
     
     def _filename_to_id(self, filename: str) -> str:
         """Converte nome de arquivo para ID (slug)."""
+        filename = unicodedata.normalize("NFKD", filename)
+        filename = filename.encode("ascii", "ignore").decode("ascii")
         clean = re.sub(r'[^\w\s-]', '', filename)
         return clean.lower().replace(' ', '-').replace('_', '-')[:50]
     

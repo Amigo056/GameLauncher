@@ -5,7 +5,7 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from src.infrastructure.covers.nds_extractor import NDSCoverExtractor
+from src.infrastructure.adapters.covers.nds_extractor import NDSCoverExtractor
 
 class TestNDSCoverExtractor:
     """Testes para extração de covers NDS."""
@@ -49,7 +49,7 @@ class TestNDSCoverExtractor:
     def test_decode_palette_index_zero_transparent(self, extractor):
         """Índice 0 da paleta deve ser sempre transparente."""
         # Paleta com cor não-zero no índice 0
-        palette_data = struct.pack('<H', 0x7FFF) + b'\\x00' * 30  # índice 0 = branco puro
+        palette_data = struct.pack('<H', 0x7FFF) + b'\x00' * 30  # índice 0 = branco puro
         palette = extractor._decode_palette(palette_data)
         
         assert palette[0] == (0, 0, 0, 0)  # transparente
@@ -58,7 +58,7 @@ class TestNDSCoverExtractor:
     def test_decode_palette_bgr555(self, extractor):
         """Deve decodificar cor BGR555 corretamente."""
         # Índice 1: vermelho puro = 0x001F (BGR555: R=31, G=0, B=0)
-        palette_data = b'\\x00\\x00' + struct.pack('<H', 0x001F) + b'\\x00' * 28
+        palette_data = b'\x00\x00' + struct.pack('<H', 0x001F) + b'\x00' * 28
         palette = extractor._decode_palette(palette_data)
         
         assert palette[1] == (248, 0, 0, 255)  # R=31<<3=248

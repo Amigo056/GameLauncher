@@ -6,8 +6,7 @@ import threading
 from src.application.use_cases.scan_library import ScanLibraryUseCase, ScanProgress
 from src.domain.entities.game import Game
 from src.domain.entities.emulator import Emulator
-from src.application.use_cases.launch_game import LaunchGameUseCase
-from src.infrastructure.system.process_manager import SubprocessProcessManager
+from src.domain.value_objects.graphics_profile import GraphicsProfile, GraphicsProfileLevel
 from src.infrastructure.container import container
 from src.presentation.widgets.game_card import GameCard, COVER_DIMENSIONS, DEFAULT_COVER_SIZE
 from src.presentation.widgets.toast import Toast
@@ -38,6 +37,9 @@ class InstalledGamesPage:
         self.games: list[Game] = []
         self._image_cache: dict = {}
         self._session_tracker = container.session_tracker
+        self._settings_service = container.settings_service
+        self._graphics_registry = container.graphics_profile_registry
+        self._graphics_profiles: dict[str, GraphicsProfile] = {}
 
         self._build_ui()
         self._load_games()
@@ -124,6 +126,8 @@ class InstalledGamesPage:
             relief='flat', font=font(t, "font_size_md"), width=30,
         ).pack(side='left', padx=8, ipady=4)
 
+        self._build_graphics_selector(search_bar)
+
         outer = tk.Frame(self.frame, bg=t.bg_primary)
         outer.pack(fill='both', expand=True, pady=(5, 0))
 
@@ -143,6 +147,81 @@ class InstalledGamesPage:
         self.canvas.pack(side="left", fill="both", expand=True, padx=(20, 0))
 
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
+    def _build_graphics_selector(self, parent: tk.Widget):
+        """Cria seletor de perfil grafico por emulador."""
+        t = DARK_THEME
+        profiles = self._graphics_registry.get_profiles(self.emulator.id)
+        self._graphics_profiles = {profile.level.label: profile for profile in profiles}
+
+        selected_level = self._settings_service.get_graphics_profile(self.emulator.id)
+        selected_label = selected_level.label
+        if selected_label not in self._graphics_profiles:
+            selected_label = GraphicsProfileLevel.BALANCED.label
+
+        graphics_frame = tk.Frame(parent, bg=t.bg_primary)
+        graphics_frame.pack(side='right')
+
+        tk.Label(
+            graphics_frame,
+            text="Gráficos",
+            bg=t.bg_primary,
+            fg=t.text_secondary,
+            font=font(t, "font_size_sm"),
+        ).pack(side='left', padx=(0, 6))
+
+        self._graphics_profile_var = tk.StringVar(value=selected_label)
+        menu = tk.OptionMenu(
+            graphics_frame,
+            self._graphics_profile_var,
+            *self._graphics_profiles.keys(),
+            command=self._on_graphics_profile_changed,
+        )
+        menu.configure(
+            bg=t.bg_card,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
+            relief='flat',
+            highlightthickness=0,
+            cursor='hand2',
+            font=font(t, "font_size_sm"),
+        )
+        menu["menu"].configure(
+            bg=t.bg_card,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
+            font=font(t, "font_size_sm"),
+        )
+        menu.pack(side='left')
+
+    def _on_graphics_profile_changed(self, label: str):
+        """Persiste selecao de perfil grafico."""
+        profile = self._graphics_profiles.get(label)
+        if not profile:
+            return
+
+        self._settings_service.save_graphics_profile(
+            self.emulator.id,
+            profile.level,
+        )
+        Toast.show(
+            self.root,
+            f"Perfil gráfico: {profile.level.label}",
+            level="success",
+            duration=1800,
+        )
+
+    def _selected_graphics_profile(self) -> GraphicsProfile:
+        """Retorna o perfil grafico selecionado na UI."""
+        label = self._graphics_profile_var.get()
+        profile = self._graphics_profiles.get(label)
+        if profile:
+            return profile
+
+        level = self._settings_service.get_graphics_profile(self.emulator.id)
+        return self._graphics_registry.get_profile(self.emulator.id, level)
 
     def _show_progress(self):
         self._progress_frame.pack(side='right', padx=10, before=self.lbl_count)
@@ -335,6 +414,7 @@ class InstalledGamesPage:
             duration=2000
         )
 
+        graphics_profile = self._selected_graphics_profile()
         self.root.iconify()
 
         def launch_and_wait():
@@ -342,7 +422,12 @@ class InstalledGamesPage:
             result = None
             
             try:
-                result = LaunchGameUseCase(SubprocessProcessManager()).execute(
+                container.create_apply_graphics_profile_use_case().execute(
+                    self.emulator,
+                    graphics_profile,
+                )
+
+                result = container.create_launch_use_case().execute(
                     game, self.emulator, wait_for_close=True
                 )
 

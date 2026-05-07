@@ -1,4 +1,5 @@
 """Implementação concreta: Gerenciamento de processos do sistema."""
+import logging
 import subprocess
 import time
 import platform
@@ -7,7 +8,10 @@ from typing import Optional
 
 import psutil
 
-from src.application.protocols.process_manager import ProcessManager
+from src.application.ports.process_manager import ProcessManager
+
+
+logger = logging.getLogger(__name__)
 
 
 class SubprocessProcessManager(ProcessManager):
@@ -27,7 +31,7 @@ class SubprocessProcessManager(ProcessManager):
         Corre o processo na pasta do executável para encontrar DLLs/plugins.
         """
         try:
-            print(f"[DEBUG] Launching: {command}")  # ⬅️ ADICIONAR
+            logger.debug("Launching process: %s", command)
 
             # Extrair diretório do executável SEM shlex.split
             # O comando começa com "path\do\exe" ou path\do\exe (sem aspas)
@@ -47,7 +51,7 @@ class SubprocessProcessManager(ProcessManager):
             
             exe_path = exe_path.resolve()
             working_dir = exe_path.parent
-            print(f"[DEBUG] Working dir: {working_dir}")
+            logger.debug("Process working dir: %s", working_dir)
             if self.system == "Windows":
                 process = subprocess.Popen(
                     command,
@@ -107,7 +111,7 @@ class SubprocessProcessManager(ProcessManager):
             return len(gone) > 0
             
         except Exception as e:
-            print(f"Erro terminando processo {pid}: {e}")
+            logger.exception("Erro terminando processo %s: %s", pid, e)
             return False
 
 

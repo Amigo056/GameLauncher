@@ -6,7 +6,7 @@ import pytest
 
 from src.application.services.cover_service import CoverService
 from src.domain.entities.game import Cover
-from src.domain.services.cover_extractor import CoverExtractor
+from src.application.ports.cover_extractor import CoverExtractor
 
 
 class MockExtractor(CoverExtractor):
