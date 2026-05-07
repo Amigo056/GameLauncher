@@ -487,6 +487,8 @@ class InstalledGamesPage:
         def launch_and_wait():
             error_msg = None
             result = None
+            auto_backup_created = False
+            auto_backup_error = None
             
             try:
                 container.create_apply_graphics_profile_use_case().execute(
@@ -500,19 +502,41 @@ class InstalledGamesPage:
 
                 if not result.success:
                     error_msg = f"Falha ao lançar:\n{result.error_message}"
+                else:
+                    try:
+                        auto_backup_created = (
+                            container.save_manager.create_auto_backup(game) is not None
+                        )
+                    except Exception as backup_exc:
+                        auto_backup_error = str(backup_exc)
             except Exception as exc:
                 error_msg = f"Erro: {str(exc)}"
                 import traceback
                 traceback.print_exc()
             finally:
-                # ✅ Closure segura - captura valores, não referências
-                self.frame.after(0, lambda msg=error_msg, res=result: 
-                    self._show_launch_result(msg, res, game.title))
+                self.frame.after(
+                    0,
+                    lambda msg=error_msg, res=result, backup=auto_backup_created,
+                    backup_error=auto_backup_error: self._show_launch_result(
+                        msg,
+                        res,
+                        game.title,
+                        backup,
+                        backup_error,
+                    ),
+                )
                 self.frame.after(0, self.root.deiconify)
 
         threading.Thread(target=launch_and_wait, daemon=True).start()
 
-    def _show_launch_result(self, error_msg: str | None, result, game_title: str):
+    def _show_launch_result(
+        self,
+        error_msg: str | None,
+        result,
+        game_title: str,
+        auto_backup_created: bool = False,
+        auto_backup_error: str | None = None,
+    ):
         """Callback seguro na UI thread."""
         if error_msg:
             Toast.show(
@@ -525,10 +549,32 @@ class InstalledGamesPage:
             self._refresh_stats()
             Toast.show(
                 self.root,
-                f"✅ {game_title} — Sessão: {result.session_duration:.0f}s",
+                self._session_result_message(
+                    game_title,
+                    result.session_duration,
+                    auto_backup_created,
+                ),
                 level="success",
                 duration=3000
             )
+            if auto_backup_error:
+                Toast.show(
+                    self.root,
+                    f"Sessao guardada, mas o backup automatico falhou: {auto_backup_error}",
+                    level="warning",
+                    duration=4500,
+                )
+
+    def _session_result_message(
+        self,
+        game_title: str,
+        session_duration: float,
+        auto_backup_created: bool,
+    ) -> str:
+        message = f"✅ {game_title} — Sessão: {session_duration:.0f}s"
+        if auto_backup_created:
+            message += " — Backup automático atualizado"
+        return message
 
 
     def _refresh_stats(self):

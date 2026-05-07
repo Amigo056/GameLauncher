@@ -269,7 +269,9 @@ Estado atual:
 - Favoritos ja ficam guardados em `config/settings.json`.
 - Biblioteca ja tem filtros `Todos`, `Favoritos` e `Recentes`.
 - Popup de detalhe ja abre ao clicar no jogo e mostra capa, ROM, estatisticas e saves.
-- Backups manuais de saves ja podem ser criados no popup de detalhe.
+- Saves ja seguem o modelo: 1 `Backup automatico` por jogo + `Slot 1`, `Slot 2`, ... manuais.
+- O `Backup automatico` e atualizado quando uma sessao termina e existe ficheiro de save.
+- Slots manuais de saves ja podem ser criados no popup de detalhe.
 - Historico recente de sessoes ja aparece no popup de detalhe.
 - Backups de saves ja podem ser restaurados/eliminados pela UI.
 - Capas manuais ja sao procuradas antes do cache em `assets/covers/manual`.

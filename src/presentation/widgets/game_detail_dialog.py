@@ -224,7 +224,7 @@ class GameDetailDialog:
 
         tk.Button(
             toolbar,
-            text="Criar backup",
+            text="Criar Slot Manual",
             bg=DARK_THEME.bg_tertiary,
             fg=DARK_THEME.text_primary,
             activebackground=DARK_THEME.bg_hover,
@@ -268,11 +268,12 @@ class GameDetailDialog:
             f"{slot.name} - {self._format_datetime(slot.created_at)} - "
             f"{self._format_size(slot.file_size)}"
         )
+        label_color = t.accent if slot.slot_type == "auto" else t.text_primary
         tk.Label(
             row,
             text=label,
             bg=t.bg_secondary,
-            fg=t.text_primary,
+            fg=label_color,
             font=font(t, "font_size_sm"),
             anchor='w',
         ).pack(side='left', fill='x', expand=True)
@@ -289,17 +290,18 @@ class GameDetailDialog:
             command=lambda current=slot: self._restore_slot(current),
         ).pack(side='right', padx=(6, 0))
 
-        tk.Button(
-            row,
-            text="Eliminar",
-            bg=t.error_bg,
-            fg=t.text_primary,
-            activebackground=t.error,
-            activeforeground=t.text_primary,
-            relief='flat',
-            cursor='hand2',
-            command=lambda current=slot: self._delete_slot(current),
-        ).pack(side='right', padx=(6, 0))
+        if slot.slot_type != "auto":
+            tk.Button(
+                row,
+                text="Eliminar",
+                bg=t.error_bg,
+                fg=t.text_primary,
+                activebackground=t.error,
+                activeforeground=t.text_primary,
+                relief='flat',
+                cursor='hand2',
+                command=lambda current=slot: self._delete_slot(current),
+            ).pack(side='right', padx=(6, 0))
 
     def _section(self, parent: tk.Widget, title: str) -> tk.Frame:
         t = DARK_THEME
@@ -423,11 +425,20 @@ class GameDetailDialog:
             )
             return
 
-        slot = self.save_manager.create_save_slot(self.game, "manual")
+        slot = self.save_manager.create_manual_slot(self.game)
+        if slot is None:
+            Toast.show(
+                self.root,
+                "Nao encontrei saves atuais para criar slot manual.",
+                level="warning",
+                duration=3000,
+            )
+            return
+
         self._render_saves_body()
         Toast.show(
             self.root,
-            f"Backup criado: {self._format_size(slot.file_size)}",
+            f"{slot.name} criado: {self._format_size(slot.file_size)}",
             level="success",
             duration=2500,
         )
