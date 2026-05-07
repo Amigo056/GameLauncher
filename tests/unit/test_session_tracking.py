@@ -154,3 +154,17 @@ class TestSessionTracker:
         assert len(most_played) == 2
         assert most_played[0][0] == "game-b"
         assert most_played[1][0] == "game-c"
+
+    def test_get_sessions_for_game_limits_results(self, tracker, mock_repo):
+        for duration in [10, 20, 30]:
+            tracker._on_game_launched(GameLaunched(
+                game_id="game-a", emulator_id="melonds", rom_path="game-a.nds"
+            ))
+            tracker._on_game_closed(GameClosed(
+                game_id="game-a", emulator_id="melonds", session_duration=float(duration)
+            ))
+
+        sessions = tracker.get_sessions_for_game("game-a", limit=2)
+
+        assert len(sessions) == 2
+        assert all(session.game_id == "game-a" for session in sessions)

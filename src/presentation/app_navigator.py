@@ -6,7 +6,7 @@ from src.presentation.pages.controller_config_page import ControllerConfigPage
 from src.presentation.pages.home_page import HomePage
 from src.presentation.pages.emulator_selection_page import EmulatorSelectionPage
 from src.presentation.pages.installed_games_page import InstalledGamesPage
-from src.presentation.pages.game_detail_page import GameDetailPage
+from src.presentation.widgets.game_detail_dialog import GameDetailDialog
 from src.domain.entities.emulator import load_emulator_from_json
 from src.presentation.widgets.toast import Toast
 from src.presentation.theme import DARK_THEME
@@ -25,6 +25,7 @@ class AppNavigator:
 
         self._pages: dict[str, object] = {}
         self._current_page_key: str | None = None
+        self._active_detail_dialog: GameDetailDialog | None = None
 
     # ─────────────────────────────────────────────
     # NAVEGAÇÃO BASE
@@ -130,33 +131,27 @@ class AppNavigator:
             traceback.print_exc()
 
     def go_game_detail(self, emulator, game):
-        """Navega para a pagina real de detalhe do jogo."""
+        """Abre o popup de detalhe do jogo."""
         games_page_key = f'games_{emulator.id}'
         games_page = self._pages.get(games_page_key)
-        page_key = f'detail_{emulator.id}_{game.id}'
 
-        old_page = self._pages.pop(page_key, None)
-        if old_page and hasattr(old_page, 'frame'):
-            old_page.frame.destroy()
+        if self._active_detail_dialog:
+            self._active_detail_dialog.destroy()
 
         def refresh_games_page(_game, _is_favorite):
             if games_page and hasattr(games_page, '_render_current_view'):
                 games_page._render_current_view()
 
-        self._pages[page_key] = GameDetailPage(
-            parent=self.container,
+        self._active_detail_dialog = GameDetailDialog(
             root_window=self.root,
             game=game,
             emulator=emulator,
             session_tracker=container.session_tracker,
             save_manager=container.save_manager,
             settings_service=container.settings_service,
-            on_back=lambda: self.go_emulator_games(emulator.id),
             on_play=games_page._on_play if games_page else lambda _game: None,
             on_favorite_changed=refresh_games_page,
         )
-
-        self._show_page(page_key, self._pages[page_key])
 
     def go_controller_config(self, emulator_id: str):
         """Navega para configuração de controlos."""

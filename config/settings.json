@@ -2,7 +2,26 @@
   "roms_base_path": "roms",
   "last_selected_emulator": null,
   "cover_cache_enabled": true,
-  "graphics_profiles": {},
+  "graphics_profiles": {
+    "melonds": "quality"
+  },
+  "favorite_games": {
+    "melonds": [
+      "3-game-pack---uno--skip-bo--uno-free-fall-usa",
+      "dragon-ball-z---supersonic-warriors-2-usa",
+      "new-super-mario-bros-usa",
+      "mario-party-ds-usa-rev-2",
+      "mario-kart-ds-usa-enfrdeesit",
+      "sonic-classic-collection-usa-enfres-ndsi-enhanced"
+    ],
+    "mgba": [
+      "sonic-battle-usa-enjafrdeesit",
+      "pokemon---firered-version-usa-europe-rev-1",
+      "pokemon---emerald-version-usa-europe",
+      "pokemon---leaf-green-version-u-v11",
+      "dragon-ball---advanced-adventure-usa"
+    ]
+  },
   "window_state": {
     "width": 1280,
     "height": 697,

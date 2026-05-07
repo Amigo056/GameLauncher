@@ -147,6 +147,11 @@ class SessionTracker:
         """Retorna sessões recentes."""
         return self.session_repo.get_recent_sessions(limit)
 
+    def get_sessions_for_game(self, game_id: str, limit: int = 10) -> list[PlaySession]:
+        """Retorna sessoes recentes de um jogo especifico."""
+        sessions = self.session_repo.get_by_game(game_id)
+        return sessions[:limit]
+
     def get_game_stats(self, game_id: str):
         """Retorna estatisticas agregadas de um jogo, se existirem."""
         if hasattr(self.session_repo, "get_game_stats"):

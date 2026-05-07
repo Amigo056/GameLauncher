@@ -7,6 +7,7 @@ import pytest
 from src.application.services.cover_service import CoverService
 from src.domain.entities.game import Cover
 from src.application.ports.cover_extractor import CoverExtractor
+from src.infrastructure.adapters.covers.fallback_extractor import FallbackCoverExtractor
 
 
 class MockExtractor(CoverExtractor):
@@ -99,3 +100,31 @@ class TestCoverPipeline:
         
         # Cover deve estar em assets/covers/melonds/
         assert "melonds" in str(cover.local_path)
+
+    def test_manual_cover_wins_over_existing_cache(self, tmp_path):
+        """Capas manuais devem sobrepor cache antigo/gerado."""
+        rom_path = tmp_path / "roms" / "Pokemon.gba"
+        rom_path.parent.mkdir()
+        rom_path.write_bytes(b"rom")
+
+        manual_dir = tmp_path / "covers" / "manual" / "mgba"
+        manual_dir.mkdir(parents=True)
+        manual_cover = manual_dir / "pokemon.png"
+        manual_cover.write_bytes(b"manual")
+
+        cached_cover = tmp_path / "cached.png"
+        cached_cover.write_bytes(b"cached")
+
+        cache = MagicMock()
+        cache.get.return_value = Cover(local_path=cached_cover)
+
+        service = CoverService(
+            extractors=[FallbackCoverExtractor(covers_base_dir=tmp_path / "covers")],
+            output_dir=tmp_path / "covers",
+            cover_cache=cache,
+        )
+
+        cover, _ = service.resolve_cover(rom_path, "pokemon", "mgba")
+
+        assert cover.local_path == manual_cover
+        cache.get.assert_not_called()

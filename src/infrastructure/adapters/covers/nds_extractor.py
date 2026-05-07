@@ -98,7 +98,7 @@ class NDSCoverExtractor(CoverExtractor):
             icon_img = self._extract_icon(banner_data, version)
             title    = self._extract_title(banner_data)
 
-            if icon_img:
+            if icon_img and self._is_icon_useful(icon_img):
                 output_dir = Path(output_dir)
                 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -111,6 +111,17 @@ class NDSCoverExtractor(CoverExtractor):
         except Exception as e:
             print(f"[NDS] Erro a extrair de {rom_path.name}: {e}")
             return None, None
+
+    def _is_icon_useful(self, icon_img: Image.Image) -> bool:
+        """Evita cachear banners vazios ou quase totalmente transparentes."""
+        alpha = icon_img.getchannel("A")
+        visible = sum(1 for value in alpha.getdata() if value > 24)
+        total = icon_img.width * icon_img.height
+        if total == 0 or visible / total < 0.04:
+            return False
+
+        bbox = alpha.getbbox()
+        return bbox is not None
 
     # ─────────────────────────────────────────────
     # ÍCONE

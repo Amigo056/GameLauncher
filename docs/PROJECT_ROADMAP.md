@@ -268,15 +268,18 @@ Estado atual:
 - Scan local ja ordena resultados e mostra titulos mais limpos na UI.
 - Favoritos ja ficam guardados em `config/settings.json`.
 - Biblioteca ja tem filtros `Todos`, `Favoritos` e `Recentes`.
-- Pagina de detalhe ja mostra capa, informacao da ROM, estatisticas e saves.
-- Backups manuais de saves ja podem ser criados pela pagina de detalhe.
+- Popup de detalhe ja abre ao clicar no jogo e mostra capa, ROM, estatisticas e saves.
+- Backups manuais de saves ja podem ser criados no popup de detalhe.
+- Historico recente de sessoes ja aparece no popup de detalhe.
+- Backups de saves ja podem ser restaurados/eliminados pela UI.
+- Capas manuais ja sao procuradas antes do cache em `assets/covers/manual`.
+- Jogos sem capa real ja recebem uma capa fallback gerada por plataforma.
+- Icons NDS vazios/quase transparentes ja sao rejeitados para cair no fallback visual.
 
 Proximos passos desta fase:
 
-- Melhorar estrategia de capas GBA sem depender apenas de screenshot via emulador.
-- Melhorar capas NDS quando a ROM nao tem icon/banner utilizavel.
-- Mostrar historico de sessoes por jogo na pagina de detalhe.
-- Evoluir saves para restaurar/eliminar backups pela UI.
+- Criar instrucoes simples/atalho de pasta para adicionar capas manuais.
+- Testar manualmente o popup com uma ROM real de GBA e NDS.
 
 ### Fase 2 - Controlos E Perfis Por Jogador
 

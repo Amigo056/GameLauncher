@@ -22,6 +22,7 @@ from src.application.services.session_tracker import SessionTracker
 from src.infrastructure.adapters.covers.nds_extractor import NDSCoverExtractor
 from src.infrastructure.adapters.covers.psp_extractor import PSPCoverExtractor
 from src.infrastructure.adapters.covers.gba_extractor import GBAScreenshotExtractor
+from src.infrastructure.adapters.covers.generated_extractor import GeneratedCoverExtractor
 from src.infrastructure.system.process_manager import SubprocessProcessManager
 from src.application.ports.process_manager import ProcessManager
 from src.infrastructure.adapters.graphics.profile_registry import GraphicsProfileRegistry
@@ -93,9 +94,10 @@ class Container:
     def cover_service(self) -> CoverService:
         if self._cover_service is None:
             extractors = [
+                FallbackCoverExtractor(),
                 NDSCoverExtractor(),
                 PSPCoverExtractor(),
-                FallbackCoverExtractor(),
+                GeneratedCoverExtractor(),
             ]
             #gba = self._resolve_mgba_path()
             #if gba:

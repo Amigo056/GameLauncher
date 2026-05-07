@@ -1,4 +1,5 @@
 """Widget reutilizável: card de um jogo no grid."""
+from collections.abc import Callable
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -26,12 +27,12 @@ class GameCard(tk.Frame):
         game: Game,
         cover_w: int,
         cover_h: int,
-        on_play: callable,
+        on_play: Callable[[Game], None],
         image_cache: dict,
         frame_ref: tk.Widget,
         stats_text: str = "",
-        on_details: callable | None = None,
-        on_toggle_favorite: callable | None = None,
+        on_details: Callable[[Game], None] | None = None,
+        on_toggle_favorite: Callable[[Game], bool] | None = None,
         is_favorite: bool = False,
     ):
         t = DARK_THEME
@@ -66,7 +67,7 @@ class GameCard(tk.Frame):
         title = self.game.title
         if len(title) > 26:
             title = title[:25] + "…"
-        tk.Label(
+        title_label = tk.Label(
             self,
             text=title,
             bg=t.bg_card,
@@ -74,25 +75,31 @@ class GameCard(tk.Frame):
             font=(t.font_family, t.font_size_sm, "bold"),
             wraplength=self.cover_w + 20,
             justify='center',
-        ).pack(pady=(8, 0))
+        )
+        title_label.pack(pady=(8, 0))
+        clickable_widgets = [self, self._lbl_cover, title_label]
 
         if self.game.region.name != "UNKNOWN":
-            tk.Label(
+            region_label = tk.Label(
                 self,
                 text=f"({self.game.region.name})",
                 bg=t.bg_card,
                 fg=t.text_secondary,
                 font=(t.font_family, t.font_size_sm),
-            ).pack()
+            )
+            region_label.pack()
+            clickable_widgets.append(region_label)
 
         if self.stats_text:
-            tk.Label(
+            stats_label = tk.Label(
                 self,
                 text=self.stats_text,
                 bg=t.bg_card,
                 fg=t.accent,
                 font=(t.font_family, t.font_size_sm),
-            ).pack(pady=(2, 0))
+            )
+            stats_label.pack(pady=(2, 0))
+            clickable_widgets.append(stats_label)
 
         actions = tk.Frame(self, bg=t.bg_card)
         actions.pack(pady=(8, 0), fill='x')
@@ -137,8 +144,8 @@ class GameCard(tk.Frame):
             command=lambda g=self.game: self.on_play(g),
         ).pack(side='left', expand=True, fill='x')
 
-        for widget in [self, self._lbl_cover]:
-            widget.bind('<Button-1>', lambda e, g=self.game: self.on_play(g))
+        for widget in clickable_widgets:
+            widget.bind('<Button-1>', lambda _event: self._open_details())
 
         self.bind('<Enter>', self._on_enter)
         self.bind('<Leave>', self._on_leave)
@@ -154,6 +161,12 @@ class GameCard(tk.Frame):
                 text="*" if self.is_favorite else "+",
                 fg=t.warning if self.is_favorite else t.text_secondary,
             )
+
+    def _open_details(self):
+        if self.on_details:
+            self.on_details(self.game)
+            return
+        self.on_play(self.game)
 
     def _on_enter(self, _=None):
         t = DARK_THEME

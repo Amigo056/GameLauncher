@@ -4,7 +4,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\6020---battleship-e_icon.png",
     "rom_checksum": "1335405600.0:16777216",
-    "created_at": "2026-05-04T11:45:07.942582",
+    "created_at": "2026-05-07T19:53:46.997863",
     "ttl_seconds": 2592000
   },
   "melonds:cars-2-usa-enfres-ndsi-enhanced": {
@@ -12,7 +12,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\cars-2-usa-enfres-ndsi-enhanced_icon.png",
     "rom_checksum": "1776293627.902724:67108864",
-    "created_at": "2026-05-04T11:45:07.942582",
+    "created_at": "2026-05-07T19:53:46.996592",
     "ttl_seconds": 2592000
   },
   "melonds:3-game-pack---uno--skip-bo--uno-free-fall-usa": {
@@ -20,7 +20,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\3-game-pack---uno--skip-bo--uno-free-fall-usa_icon.png",
     "rom_checksum": "1479032376.0:8388608",
-    "created_at": "2026-05-04T11:45:07.942582",
+    "created_at": "2026-05-07T19:53:46.993349",
     "ttl_seconds": 2592000
   },
   "melonds:cars-usa": {
@@ -28,7 +28,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\cars-usa_icon.png",
     "rom_checksum": "1776291615.101443:16777216",
-    "created_at": "2026-05-04T11:45:07.942582",
+    "created_at": "2026-05-07T19:53:46.995350",
     "ttl_seconds": 2592000
   },
   "melonds:madagascar-usa": {
@@ -36,7 +36,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\madagascar-usa_icon.png",
     "rom_checksum": "1776296795.8380215:16777216",
-    "created_at": "2026-05-04T11:45:07.957894",
+    "created_at": "2026-05-07T19:53:47.008658",
     "ttl_seconds": 2592000
   },
   "melonds:dragon-ball-z---supersonic-warriors-2-usa": {
@@ -44,7 +44,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\dragon-ball-z---supersonic-warriors-2-usa_icon.png",
     "rom_checksum": "1479031104.0:67108864",
-    "created_at": "2026-05-04T11:45:07.957894",
+    "created_at": "2026-05-07T19:53:47.001414",
     "ttl_seconds": 2592000
   },
   "melonds:legend-of-zelda-the---phantom-hourglass-usa-enfres": {
@@ -52,7 +52,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\legend-of-zelda-the---phantom-hourglass-usa-enfres_icon.png",
     "rom_checksum": "1776301828.5041833:67108864",
-    "created_at": "2026-05-04T11:45:07.957894",
+    "created_at": "2026-05-07T19:53:47.006661",
     "ttl_seconds": 2592000
   },
   "melonds:kung-fu-panda-usa": {
@@ -60,7 +60,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\kung-fu-panda-usa_icon.png",
     "rom_checksum": "1776301813.6324701:33554432",
-    "created_at": "2026-05-04T11:45:07.957894",
+    "created_at": "2026-05-07T19:53:47.003662",
     "ttl_seconds": 2592000
   },
   "melonds:mario-hoops-3-on-3-usa": {
@@ -68,7 +68,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\mario-hoops-3-on-3-usa_icon.png",
     "rom_checksum": "1776359649.1470556:67108864",
-    "created_at": "2026-05-04T11:45:07.972192",
+    "created_at": "2026-05-07T19:53:47.029260",
     "ttl_seconds": 2592000
   },
   "melonds:mario--sonic-at-the-olympic-games-usa-enfrdeesit": {
@@ -76,7 +76,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\mario--sonic-at-the-olympic-games-usa-enfrdeesit_icon.png",
     "rom_checksum": "1776301845.8262317:134217728",
-    "created_at": "2026-05-04T11:45:07.973193",
+    "created_at": "2026-05-07T19:53:47.027767",
     "ttl_seconds": 2592000
   },
   "melonds:mario-party-ds-usa-rev-2": {
@@ -84,7 +84,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\mario-party-ds-usa-rev-2_icon.png",
     "rom_checksum": "1776301885.4646065:33554432",
-    "created_at": "2026-05-04T11:45:07.973193",
+    "created_at": "2026-05-07T19:53:47.034268",
     "ttl_seconds": 2592000
   },
   "melonds:mario-kart-ds-usa-enfrdeesit": {
@@ -92,7 +92,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\mario-kart-ds-usa-enfrdeesit_icon.png",
     "rom_checksum": "1479013142.0:33554432",
-    "created_at": "2026-05-04T11:45:07.973193",
+    "created_at": "2026-05-07T19:53:47.032270",
     "ttl_seconds": 2592000
   },
   "melonds:phineas-and-ferb-usa-rev-1": {
@@ -100,7 +100,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\phineas-and-ferb-usa-rev-1_icon.png",
     "rom_checksum": "1521720640.0:67108864",
-    "created_at": "2026-05-04T11:45:07.987553",
+    "created_at": "2026-05-07T19:53:47.039255",
     "ttl_seconds": 2592000
   },
   "melonds:plants-vs-zombies-usa": {
@@ -108,7 +108,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\plants-vs-zombies-usa_icon.png",
     "rom_checksum": "1777788986.0908074:67108864",
-    "created_at": "2026-05-04T11:45:07.987553",
+    "created_at": "2026-05-07T19:53:47.042437",
     "ttl_seconds": 2592000
   },
   "melonds:new-super-mario-bros-usa": {
@@ -116,7 +116,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\new-super-mario-bros-usa_icon.png",
     "rom_checksum": "1776301867.879686:33554432",
-    "created_at": "2026-05-04T11:45:07.988549",
+    "created_at": "2026-05-07T19:53:47.037770",
     "ttl_seconds": 2592000
   },
   "melonds:phineas-and-ferb---across-the-2nd-dimension-usa-en": {
@@ -124,7 +124,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\phineas-and-ferb---across-the-2nd-dimension-usa-en_icon.png",
     "rom_checksum": "1479011848.0:67108864",
-    "created_at": "2026-05-04T11:45:07.989550",
+    "created_at": "2026-05-07T19:53:47.041408",
     "ttl_seconds": 2592000
   },
   "melonds:sonic-classic-collection-usa-enfres-ndsi-enhanced": {
@@ -132,7 +132,7 @@
     "emulator_id": "melonds",
     "cover_path": "assets\\covers\\melonds\\sonic-classic-collection-usa-enfres-ndsi-enhanced_icon.png",
     "rom_checksum": "851470320.0:67108864",
-    "created_at": "2026-05-04T11:45:08.002547",
+    "created_at": "2026-05-07T19:53:47.046408",
     "ttl_seconds": 2592000
   },
   "ppsspp:3268---carros-portugal-v101": {
@@ -140,7 +140,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\3268---carros-portugal-v101_pic.png",
     "rom_checksum": "1423746000.0:906362880",
-    "created_at": "2026-05-04T12:13:57.076544",
+    "created_at": "2026-05-07T19:56:58.552793",
     "ttl_seconds": 2592000
   },
   "ppsspp:0753---sonic-rivals-usa": {
@@ -148,7 +148,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\0753---sonic-rivals-usa_pic.png",
     "rom_checksum": "851470320.0:246087680",
-    "created_at": "2026-05-04T12:13:57.078542",
+    "created_at": "2026-05-07T19:56:58.545583",
     "ttl_seconds": 2592000
   },
   "ppsspp:3019---one-piece---romance-dawn---bouken-no-yoake-": {
@@ -156,7 +156,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\3019---one-piece---romance-dawn---bouken-no-yoake-_pic.png",
     "rom_checksum": "1296856116.0:863207424",
-    "created_at": "2026-05-04T12:13:57.078542",
+    "created_at": "2026-05-07T19:56:58.548781",
     "ttl_seconds": 2592000
   },
   "ppsspp:cloudy-with-a-chance-of-meatballs-usa": {
@@ -164,7 +164,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\cloudy-with-a-chance-of-meatballs-usa_pic.png",
     "rom_checksum": "1252615662.0:963182592",
-    "created_at": "2026-05-04T12:13:57.227066",
+    "created_at": "2026-05-07T19:56:58.551795",
     "ttl_seconds": 2592000
   },
   "ppsspp:disney-pixar-cars---race-o-rama-usa": {
@@ -172,7 +172,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\disney-pixar-cars---race-o-rama-usa_pic.png",
     "rom_checksum": "1255458886.0:906330112",
-    "created_at": "2026-05-04T12:13:57.228079",
+    "created_at": "2026-05-07T19:56:58.556405",
     "ttl_seconds": 2592000
   },
   "ppsspp:disney-pixar-wall-e-usa": {
@@ -180,7 +180,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\disney-pixar-wall-e-usa_pic.png",
     "rom_checksum": "1213908422.0:767590400",
-    "created_at": "2026-05-04T12:13:57.229077",
+    "created_at": "2026-05-07T19:56:58.559417",
     "ttl_seconds": 2592000
   },
   "ppsspp:disney-pixar-cars-2-usa": {
@@ -188,7 +188,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\disney-pixar-cars-2-usa_pic.png",
     "rom_checksum": "1321291116.0:732397568",
-    "created_at": "2026-05-04T12:13:57.230077",
+    "created_at": "2026-05-07T19:56:58.558415",
     "ttl_seconds": 2592000
   },
   "ppsspp:dragon-ball-z---shin-budokai---another-road-usa": {
@@ -196,7 +196,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\dragon-ball-z---shin-budokai---another-road-usa_pic.png",
     "rom_checksum": "1200057460.0:529432576",
-    "created_at": "2026-05-04T12:13:57.242225",
+    "created_at": "2026-05-07T19:56:58.560414",
     "ttl_seconds": 2592000
   },
   "ppsspp:marvel-super-hero-squad-usa": {
@@ -204,7 +204,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\marvel-super-hero-squad-usa_icon.png",
     "rom_checksum": "1256055808.0:1576009728",
-    "created_at": "2026-05-04T12:13:57.296231",
+    "created_at": "2026-05-07T19:56:58.579572",
     "ttl_seconds": 2592000
   },
   "ppsspp:open-season-usa-enfresnl": {
@@ -212,7 +212,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\open-season-usa-enfresnl_pic.png",
     "rom_checksum": "1158607974.0:1105362944",
-    "created_at": "2026-05-04T12:13:57.298347",
+    "created_at": "2026-05-07T19:56:58.581811",
     "ttl_seconds": 2592000
   },
   "ppsspp:dreamworks-megamind---the-blue-defender-usa-enfr": {
@@ -220,7 +220,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\dreamworks-megamind---the-blue-defender-usa-enfr_pic.png",
     "rom_checksum": "1468709820.0:906330112",
-    "created_at": "2026-05-04T12:13:57.299356",
+    "created_at": "2026-05-07T19:56:58.578563",
     "ttl_seconds": 2592000
   },
   "ppsspp:pes-2012---pro-evolution-soccer-usa": {
@@ -228,7 +228,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\pes-2012---pro-evolution-soccer-usa_pic.png",
     "rom_checksum": "1322272226.0:1805778944",
-    "created_at": "2026-05-04T12:13:57.301357",
+    "created_at": "2026-05-07T19:56:58.584806",
     "ttl_seconds": 2592000
   },
   "ppsspp:sonic-rivals-2-usa": {
@@ -236,7 +236,7 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\sonic-rivals-2-usa_pic.png",
     "rom_checksum": "1468774936.0:515866624",
-    "created_at": "2026-05-04T12:13:57.316007",
+    "created_at": "2026-05-07T19:56:58.586198",
     "ttl_seconds": 2592000
   },
   "ppsspp:surfs-up-usa-enfres": {
@@ -244,7 +244,167 @@
     "emulator_id": "ppsspp",
     "cover_path": "assets\\covers\\ppsspp\\surfs-up-usa-enfres_pic.png",
     "rom_checksum": "1180627268.0:906362880",
-    "created_at": "2026-05-04T12:13:57.320009",
+    "created_at": "2026-05-07T19:56:58.588378",
+    "ttl_seconds": 2592000
+  },
+  "mgba:cars-usa-europe": {
+    "game_id": "cars-usa-europe",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\cars-usa-europe_generated.png",
+    "rom_checksum": "1777793836.665203:8388608",
+    "created_at": "2026-05-07T19:56:34.062051",
+    "ttl_seconds": 2592000
+  },
+  "mgba:dragon-ball---advanced-adventure-usa": {
+    "game_id": "dragon-ball---advanced-adventure-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\dragon-ball---advanced-adventure-usa_generated.png",
+    "rom_checksum": "851488320.0:16777216",
+    "created_at": "2026-05-07T19:56:34.086348",
+    "ttl_seconds": 2592000
+  },
+  "mgba:classic-nes-series---super-mario-bros-usa-europe": {
+    "game_id": "classic-nes-series---super-mario-bros-usa-europe",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\classic-nes-series---super-mario-bros-usa-europe_generated.png",
+    "rom_checksum": "851495520.0:4194304",
+    "created_at": "2026-05-07T19:56:34.090348",
+    "ttl_seconds": 2592000
+  },
+  "mgba:legend-of-zelda-the---the-minish-cap-usa": {
+    "game_id": "legend-of-zelda-the---the-minish-cap-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\legend-of-zelda-the---the-minish-cap-usa_generated.png",
+    "rom_checksum": "1777793868.6708994:16777216",
+    "created_at": "2026-05-07T19:56:34.093835",
+    "ttl_seconds": 2592000
+  },
+  "mgba:lilo--stitch-usa": {
+    "game_id": "lilo--stitch-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\lilo--stitch-usa_generated.png",
+    "rom_checksum": "851434320.0:8388608",
+    "created_at": "2026-05-07T19:56:34.221481",
+    "ttl_seconds": 2592000
+  },
+  "mgba:lilo--stitch-2---haemsterviel-havoc-usa": {
+    "game_id": "lilo--stitch-2---haemsterviel-havoc-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\lilo--stitch-2---haemsterviel-havoc-usa_generated.png",
+    "rom_checksum": "851488320.0:8388608",
+    "created_at": "2026-05-07T19:56:34.232723",
+    "ttl_seconds": 2592000
+  },
+  "mgba:mario--luigi---superstar-saga-usa": {
+    "game_id": "mario--luigi---superstar-saga-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\mario--luigi---superstar-saga-usa_generated.png",
+    "rom_checksum": "1777794365.3907797:16777216",
+    "created_at": "2026-05-07T19:56:34.238447",
+    "ttl_seconds": 2592000
+  },
+  "mgba:naruto---ninja-council-2-usa": {
+    "game_id": "naruto---ninja-council-2-usa",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\naruto---ninja-council-2-usa_generated.png",
+    "rom_checksum": "851488320.0:8388608",
+    "created_at": "2026-05-07T19:56:34.241532",
+    "ttl_seconds": 2592000
+  },
+  "mgba:pokemon---emerald-version-usa-europe": {
+    "game_id": "pokemon---emerald-version-usa-europe",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\pokemon---emerald-version-usa-europe_generated.png",
+    "rom_checksum": "851488320.0:16777216",
+    "created_at": "2026-05-07T19:56:34.373112",
+    "ttl_seconds": 2592000
+  },
+  "mgba:sonic-battle-usa-enjafrdeesit": {
+    "game_id": "sonic-battle-usa-enjafrdeesit",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\sonic-battle-usa-enjafrdeesit_generated.png",
+    "rom_checksum": "1777794356.3856807:16777216",
+    "created_at": "2026-05-07T19:56:34.381908",
+    "ttl_seconds": 2592000
+  },
+  "mgba:pokemon---firered-version-usa-europe-rev-1": {
+    "game_id": "pokemon---firered-version-usa-europe-rev-1",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\pokemon---firered-version-usa-europe-rev-1_generated.png",
+    "rom_checksum": "851488320.0:16777216",
+    "created_at": "2026-05-07T19:56:34.384108",
+    "ttl_seconds": 2592000
+  },
+  "mgba:pokemon---leaf-green-version-u-v11": {
+    "game_id": "pokemon---leaf-green-version-u-v11",
+    "emulator_id": "mgba",
+    "cover_path": "assets\\covers\\mgba\\pokemon---leaf-green-version-u-v11_generated.png",
+    "rom_checksum": "851459520.0:16777216",
+    "created_at": "2026-05-07T19:56:34.386151",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:legend-of-zelda-the---majoras-mask-usa": {
+    "game_id": "legend-of-zelda-the---majoras-mask-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\legend-of-zelda-the---majoras-mask-usa_generated.png",
+    "rom_checksum": "970291334.0:33554432",
+    "created_at": "2026-05-07T19:57:03.139084",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:legend-of-zelda-the---ocarina-of-time-usa-rev-2": {
+    "game_id": "legend-of-zelda-the---ocarina-of-time-usa-rev-2",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\legend-of-zelda-the---ocarina-of-time-usa-rev-2_generated.png",
+    "rom_checksum": "847256600.0:33554432",
+    "created_at": "2026-05-07T19:57:03.144765",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:bomberman-64-usa": {
+    "game_id": "bomberman-64-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\bomberman-64-usa_generated.png",
+    "rom_checksum": "1776734069.8148146:8388608",
+    "created_at": "2026-05-07T19:57:03.153437",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:mario-kart-64-usa": {
+    "game_id": "mario-kart-64-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\mario-kart-64-usa_generated.png",
+    "rom_checksum": "1080447920.0:12582912",
+    "created_at": "2026-05-07T19:57:03.155642",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:mario-party-3-usa": {
+    "game_id": "mario-party-3-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\mario-party-3-usa_generated.png",
+    "rom_checksum": "1080447994.0:33554432",
+    "created_at": "2026-05-07T19:57:03.283927",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:pokemon-stadium-2-usa": {
+    "game_id": "pokemon-stadium-2-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\pokemon-stadium-2-usa_generated.png",
+    "rom_checksum": "847242282.0:67108864",
+    "created_at": "2026-05-07T19:57:03.299620",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:mickey-no-racing-challenge-usa-j-": {
+    "game_id": "mickey-no-racing-challenge-usa-j-",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\mickey-no-racing-challenge-usa-j-_generated.png",
+    "rom_checksum": "1312041022.7565458:33554432",
+    "created_at": "2026-05-07T19:57:03.302619",
+    "ttl_seconds": 2592000
+  },
+  "mupen64plus:super-mario-64-usa": {
+    "game_id": "super-mario-64-usa",
+    "emulator_id": "mupen64plus",
+    "cover_path": "assets\\covers\\mupen64plus\\super-mario-64-usa_generated.png",
+    "rom_checksum": "950567884.0:8388608",
+    "created_at": "2026-05-07T19:57:03.305287",
     "ttl_seconds": 2592000
   }
 }

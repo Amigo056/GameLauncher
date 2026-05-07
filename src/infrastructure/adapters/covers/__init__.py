@@ -2,12 +2,14 @@
 
 from src.infrastructure.adapters.covers.fallback_extractor import FallbackCoverExtractor
 from src.infrastructure.adapters.covers.gba_extractor import GBAScreenshotExtractor
+from src.infrastructure.adapters.covers.generated_extractor import GeneratedCoverExtractor
 from src.infrastructure.adapters.covers.nds_extractor import NDSCoverExtractor
 from src.infrastructure.adapters.covers.psp_extractor import PSPCoverExtractor
 
 __all__ = [
     "FallbackCoverExtractor",
     "GBAScreenshotExtractor",
+    "GeneratedCoverExtractor",
     "NDSCoverExtractor",
     "PSPCoverExtractor",
 ]
