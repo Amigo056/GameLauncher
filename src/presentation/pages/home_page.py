@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox
+
+from src.presentation.theme import DARK_THEME, font
 
 
 class HomePage:
@@ -12,7 +13,7 @@ class HomePage:
             on_emulators: Callback quando clicar em "Emuladores"
             on_settings: Callback quando clicar em "Definições"
         """
-        self.frame = tk.Frame(parent, bg='#1e1e1e')
+        self.frame = tk.Frame(parent, bg=DARK_THEME.bg_primary)
         
         self.on_emulators = on_emulators
         self.on_settings = on_settings
@@ -21,28 +22,30 @@ class HomePage:
     
     def _build_ui(self):
         """Constrói a interface."""
+        t = DARK_THEME
+        
         # Container centralizado
-        center = tk.Frame(self.frame, bg='#1e1e1e')
+        center = tk.Frame(self.frame, bg=t.bg_primary)
         center.place(relx=0.5, rely=0.5, anchor='center')
         
         # Título
         tk.Label(
             center,
             text="🎮 GameLauncher",
-            bg='#1e1e1e',
-            fg='white',
-            font=('Segoe UI', 36, 'bold')
+            bg=t.bg_primary,
+            fg=t.text_primary,
+            font=font(t, "font_size_3xl", bold=True)
         ).pack(pady=(0, 50))
         
         # Botão Emuladores
         tk.Button(
             center,
             text="📁  Emuladores",
-            font=('Segoe UI', 16),
-            bg='#0078d4',
-            fg='white',
-            activebackground='#106ebe',
-            activeforeground='white',
+            font=font(t, "font_size_lg"),
+            bg=t.accent,
+            fg=t.text_primary,
+            activebackground=t.accent_hover,
+            activeforeground=t.text_primary,
             relief='flat',
             cursor='hand2',
             width=20,
@@ -54,11 +57,11 @@ class HomePage:
         tk.Button(
             center,
             text="⚙️  Definições",
-            font=('Segoe UI', 16),
-            bg='#333333',
-            fg='white',
-            activebackground='#444444',
-            activeforeground='white',
+            font=font(t, "font_size_lg"),
+            bg=t.bg_tertiary,
+            fg=t.text_primary,
+            activebackground=t.bg_hover,
+            activeforeground=t.text_primary,
             relief='flat',
             cursor='hand2',
             width=20,
@@ -70,8 +73,7 @@ class HomePage:
         tk.Label(
             center,
             text="v1.0",
-            bg='#1e1e1e',
-            fg='#666666',
-            font=('Segoe UI', 9)
+            bg=t.bg_primary,
+            fg=t.text_disabled,
+            font=font(t, "font_size_sm")
         ).pack(side='bottom', pady=50)
-    

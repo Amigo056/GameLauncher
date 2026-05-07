@@ -1,3 +1,4 @@
+# GameLauncher — Dependências de produção
 beautifulsoup4>=4.12.0
 requests>=2.31.0
 pillow>=10.0.0

@@ -1,19 +1,14 @@
-"""Navegação principal da aplicação."""
 import tkinter as tk
-from tkinter import messagebox
-from pathlib import Path
 
-from src.infrastructure.covers.nds_extractor import NDSCoverExtractor
-from src.application.services.cover_service import CoverService
+from src.infrastructure.container import container
 from src.application.use_cases.scan_library import ScanLibraryUseCase
-from src.infrastructure.covers.fallback_extractor import FallbackCoverExtractor
-from src.infrastructure.covers.psp_extractor import PSPCoverExtractor
 from src.presentation.pages.controller_config_page import ControllerConfigPage
 from src.presentation.pages.home_page import HomePage
 from src.presentation.pages.emulator_selection_page import EmulatorSelectionPage
 from src.presentation.pages.installed_games_page import InstalledGamesPage
-from src.infrastructure.persistence.local_game_repo import LocalGameRepository
 from src.domain.entities.emulator import load_emulator_from_json
+from src.presentation.widgets.toast import Toast
+from src.presentation.theme import DARK_THEME
 
 
 class AppNavigator:
@@ -22,7 +17,7 @@ class AppNavigator:
     def __init__(self, root: tk.Tk):
         self.root = root
 
-        self.container = tk.Frame(root, bg='#1e1e1e')
+        self.container = tk.Frame(root, bg=DARK_THEME.bg_primary)
         self.container.grid(row=0, column=0, sticky="nsew")
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
@@ -49,17 +44,6 @@ class AppNavigator:
             page_instance.frame.lift()
             self.container.update_idletasks()
 
-    def _build_cover_service(self) -> CoverService:
-        """Constrói CoverService com todos os extratores."""
-        return CoverService(
-            extractors=[
-                FallbackCoverExtractor(),
-                NDSCoverExtractor(),
-                PSPCoverExtractor(),
-            ],
-            output_dir=Path("assets/covers")
-        )
-
     # ─────────────────────────────────────────────
     # ROTAS
     # ─────────────────────────────────────────────
@@ -83,21 +67,33 @@ class AppNavigator:
         self._show_page('emulators', self._pages['emulators'])
 
     def go_settings(self):
-        messagebox.showinfo("Definições", "Em breve…")
+        Toast.show(
+            self.root,
+            "Definições em breve…",
+            level="info",
+            duration=3000
+        )
 
     def go_emulator_games(self, emulator_id: str):
         """Navega para os jogos do emulador. Cria a página uma só vez."""
         try:
             emulator = load_emulator_from_json(emulator_id)
             if not emulator:
-                messagebox.showerror("Erro", f"Emulador '{emulator_id}' não encontrado!")
+                Toast.show(
+                    self.root,
+                    f"Emulador '{emulator_id}' não encontrado!",
+                    level="error",
+                    duration=5000
+                )
                 return
 
             if not emulator.is_installed:
-                messagebox.showwarning(
-                    "Emulador não instalado",
-                    f"{emulator.name} não foi encontrado.\n"
-                    "Verifica os caminhos em config/emulators.json"
+                Toast.show(
+                    self.root,
+                    f"{emulator.name} não foi encontrado.\\n"
+                    "Verifica os caminhos em config/emulators.json",
+                    level="warning",
+                    duration=5000
                 )
                 return
 
@@ -106,8 +102,8 @@ class AppNavigator:
             # Criar apenas se ainda não existe — o botão "Atualizar" dentro
             # da própria página trata de forçar novo scan quando necessário.
             if page_key not in self._pages:
-                game_repo = LocalGameRepository(Path("roms"))
-                cover_service = self._build_cover_service()
+                game_repo = container.game_repo
+                cover_service = container.cover_service
                 scan_use_case = ScanLibraryUseCase(game_repo, cover_service)
 
                 self._pages[page_key] = InstalledGamesPage(
@@ -122,7 +118,12 @@ class AppNavigator:
             self._show_page(page_key, self._pages[page_key])
 
         except Exception as e:
-            messagebox.showerror("Erro", str(e))
+            Toast.show(
+                self.root,
+                f"Erro: {str(e)}",
+                level="error",
+                duration=5000
+            )
             import traceback
             traceback.print_exc()
 

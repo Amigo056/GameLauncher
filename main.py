@@ -12,7 +12,8 @@ def ensure_directories():
     """Cria estrutura de pastas necessária."""
     dirs = [
         "assets/covers", "assets/icons",
-        "roms/NDS", "roms/PSP", "roms/N64",
+        "roms/NDS", "roms/PSP", 
+        "roms/N64", "roms/GBA",
         "logs",
     ]
     for d in dirs:
@@ -28,13 +29,14 @@ def main():
 
     from src.presentation.app_navigator import AppNavigator
     from src.application.services.settings_service import SettingsService
+    from src.presentation.theme import DARK_THEME
 
     settings_service = SettingsService()
 
     root = tk.Tk()
     root.title("GameLauncher")
     root.minsize(900, 600)
-    root.configure(bg='#1e1e1e')
+    root.configure(bg=DARK_THEME.bg_primary)
 
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(0, weight=1)
@@ -56,4 +58,8 @@ def main():
 
 
 if __name__ == "__main__":
+    from src.domain.entities.emulator import load_emulator_from_json
+    emu = load_emulator_from_json("mgba")
+    print(f"mGBA path: {emu.executable_path if emu else 'NÃO ENCONTRADO'}")
+    print(f"mGBA installed: {emu.is_installed if emu else False}")
     main()

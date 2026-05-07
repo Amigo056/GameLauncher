@@ -66,6 +66,7 @@ class LaunchGameUseCase:
         # Construir comando
         try:
             command = emulator.build_launch_command(game.rom.file_path)
+            print(f"[DEBUG] Comando: {command}") 
         except Exception as e:
             return LaunchResult(
                 success=False,

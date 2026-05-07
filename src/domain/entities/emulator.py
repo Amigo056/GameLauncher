@@ -10,13 +10,14 @@ class Platform(Enum):
     NINTENDO_DS = "nintendo-ds"
     PLAYSTATION_PORTABLE = "playstation-portable"
     NINTENDO_64 = "nintendo-64"
+    GAME_BOY_ADVANCE      = "game-boy-advance"
     UNKNOWN = "unknown"
 
 @dataclass(frozen=True)
 class EmulatorConfig:
     """Value Object: Configurações de execução seguras."""
     safe_settings: Dict[str, str] = field(default_factory=dict)
-    config_file_path: Optional[Path] = None  # %APPDATA% resolvido depois
+    config_file_path: Optional[Path] = None 
     
     def get_setting(self, key: str, default: str = "") -> str:
         """Obtém setting seguro."""
@@ -28,15 +29,16 @@ class Emulator:
     id: str  # "melonds", "ppsspp"
     name: str  # "Nintendo DS"
     platform: Platform
-    icon_path: Optional[Path] = None
-    executable_path: Optional[Path] = None  # Path real do .exe
-    executable_names: List[str] = field(default_factory=list)  # Nomes possíveis
-    default_install_paths: List[Path] = field(default_factory=list)  # Caminhos padrão
-    supported_extensions: List[str] = field(default_factory=list)  # [".nds", ".zip"]
-    roms_folder: Path = field(default=Path("roms"))
-    launch_args_template: str = '"{rom_path}"'  # Template: {rom_path}
-    config: EmulatorConfig = field(default_factory=EmulatorConfig)
-    
+    icon_path: Optional[Path]               = None
+    executable_path: Optional[Path]         = None  # Path real do .exe
+    executable_names: List[str]             = field(default_factory=list)  # Nomes possíveis
+    default_install_paths: List[Path]       = field(default_factory=list)  # Caminhos padrão
+    supported_extensions: List[str]         = field(default_factory=list)  # [".nds", ".zip"]
+    roms_folder: Path                       = field(default=Path("roms"))
+    launch_args_template: str               = '"{rom_path}"'  # Template: {rom_path}
+    config: EmulatorConfig                  = field(default_factory=EmulatorConfig)
+    save_dir: Optional[Path]                = None
+
     def __post_init__(self):
         if not self.id:
             raise ValueError("Emulator.id não pode ser vazio")
@@ -89,7 +91,7 @@ class Emulator:
             screen_w, screen_h = self._get_screen_resolution()
             resolution_arg = f"--resolution {screen_w}x{screen_h}"
             return f'"{exe_abs}" {resolution_arg} {args}'
-        
+
         return f'"{exe_abs}" {args}'
     
     def supports_extension(self, ext: str) -> bool:
@@ -118,23 +120,24 @@ def load_emulator_from_json(
             data = json.load(f)
         
         # Encontrar config do emulador específico
-        emu_config = None
-        for emu in data.get('emulators', []):
-            if emu['id'] == emu_id:
-                emu_config = emu
-                break
+        emu_config = next(
+            (e for e in data.get('emulators', []) if e['id'] == emu_id),
+            None
+        )
         
         if not emu_config:
             return None
         
         # Mapear plataforma
         platform_map = {
-            'melonds': Platform.NINTENDO_DS,
-            'ppsspp': Platform.PLAYSTATION_PORTABLE,
-            'mupen64plus': Platform.NINTENDO_64,
+            'melonds':      Platform.NINTENDO_DS,
+            'ppsspp':       Platform.PLAYSTATION_PORTABLE,
+            'mupen64plus':  Platform.NINTENDO_64,
+            'mgba':         Platform.GAME_BOY_ADVANCE,
 
         }
-        platform = platform_map.get(emu_id.lower(), Platform.UNKNOWN)
+
+        emu_platform = platform_map.get(emu_id.lower(), Platform.UNKNOWN)
         
         # Converter paths string para Path objects
         project_root = Path(__file__).parent.parent.parent.parent  # até à raiz
@@ -144,8 +147,9 @@ def load_emulator_from_json(
             project_root / "emulators" / emu_id.lower(),
         ]
 
-        default_paths = [Path(p) for p in emu_config.get('default_install_paths', [])]
-        default_paths = project_paths + default_paths
+        default_paths = project_paths + [
+            Path(p) for p in emu_config.get('default_install_paths', [])
+        ]
         
         # Tentar encontrar executável
         exe_path = None
@@ -167,19 +171,22 @@ def load_emulator_from_json(
             config_file_path=Path(os.path.expandvars(emu_config.get('config_file', ''))) 
             if emu_config.get('config_file') else None
         )
+
+        roms_folder = Path(emu_config.get('roms_folder', 'roms'))
         
         return Emulator(
             id=emu_config['id'],
             name=emu_config['name'],
-            platform=platform,
+            platform=emu_platform,
             icon_path=Path(emu_config['icon']) if emu_config.get('icon') else None,
             executable_path=exe_path,
             executable_names=emu_config.get('executable_names', []),
             default_install_paths=default_paths,
             supported_extensions=emu_config.get('rom_extensions', []),
-            roms_folder=Path(emu_config.get('roms_folder', 'roms')),
+            roms_folder=roms_folder,
             launch_args_template=emu_config.get('launch_args', '"{rom_path}"'),
-            config=emulator_config
+            config=emulator_config,
+            save_dir=roms_folder if emu_id == 'mgba' else None
         )
         
     except Exception as e:

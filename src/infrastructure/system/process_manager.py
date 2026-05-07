@@ -13,7 +13,7 @@ from src.application.protocols.process_manager import ProcessManager
 class SubprocessProcessManager(ProcessManager):
     """Implementação do ProcessManager usando subprocess e psutil."""
 
-    def __init__(self, shell: bool = True):
+    def __init__(self, shell: bool = False):
         self.shell = shell
         self.system = platform.system()
         self._creationflags = 0
@@ -27,6 +27,8 @@ class SubprocessProcessManager(ProcessManager):
         Corre o processo na pasta do executável para encontrar DLLs/plugins.
         """
         try:
+            print(f"[DEBUG] Launching: {command}")  # ⬅️ ADICIONAR
+
             # Extrair diretório do executável SEM shlex.split
             # O comando começa com "path\do\exe" ou path\do\exe (sem aspas)
             command_stripped = command.strip()
@@ -45,7 +47,7 @@ class SubprocessProcessManager(ProcessManager):
             
             exe_path = exe_path.resolve()
             working_dir = exe_path.parent
-        
+            print(f"[DEBUG] Working dir: {working_dir}")
             if self.system == "Windows":
                 process = subprocess.Popen(
                     command,

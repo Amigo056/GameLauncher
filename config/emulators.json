@@ -48,6 +48,25 @@
         "InternalResolution": "2",
         "TextureScalingLevel": "0"
       }
-    }
+    },
+    {
+      "id": "mgba",
+      "name": "Game Boy Advance",
+      "icon": "assets/icons/gba.png",
+      "executable_names": [
+        "mGBA.exe"
+      ],
+      "default_install_paths": [
+        ".\\emulators\\mGBA"
+      ],
+      "rom_extensions": [
+        ".gba",
+        ".gbc",
+        ".gb"
+      ],
+      "roms_folder": "roms/GBA",
+      "launch_args": "\"{rom_path}\"",
+      "notes": "Fullscreen (-f), saves na pasta da ROM"
+    }       
   ]
 }

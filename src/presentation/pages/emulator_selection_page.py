@@ -3,6 +3,8 @@ import tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageTk
 
+from src.presentation.theme import DARK_THEME, font
+
 
 class EmulatorSelectionPage:
     """Página para selecionar qual emulador/plataforma usar."""
@@ -20,7 +22,8 @@ class EmulatorSelectionPage:
         on_select_emulator: callable,
         emulators_config: list[dict] = None
     ):
-        self.frame = tk.Frame(parent, bg='#1e1e1e')
+        t = DARK_THEME
+        self.frame = tk.Frame(parent, bg=t.bg_primary)
 
         self.on_back = on_back
         self.on_select_emulator = on_select_emulator
@@ -34,16 +37,18 @@ class EmulatorSelectionPage:
 
     def _build_ui(self):
         """Constrói a interface."""
+        t = DARK_THEME
+        
         # Header
-        header = tk.Frame(self.frame, bg='#1e1e1e', padx=20, pady=20)
+        header = tk.Frame(self.frame, bg=t.bg_primary, padx=20, pady=20)
         header.pack(fill='x')
 
         tk.Button(
             header,
             text="← Voltar",
-            font=('Segoe UI', 11),
-            bg='#333333',
-            fg='white',
+            font=font(t, "font_size_md"),
+            bg=t.bg_tertiary,
+            fg=t.text_primary,
             relief='flat',
             cursor='hand2',
             command=lambda: self.frame.after(10, self.on_back)
@@ -52,13 +57,13 @@ class EmulatorSelectionPage:
         tk.Label(
             header,
             text="Seleciona uma plataforma",
-            bg='#1e1e1e',
-            fg='white',
-            font=('Segoe UI', 20, 'bold')
+            bg=t.bg_primary,
+            fg=t.text_primary,
+            font=font(t, "font_size_2xl", bold=True)
         ).pack(side='left', padx=20)
 
         # Container dos cards
-        container = tk.Frame(self.frame, bg='#1e1e1e')
+        container = tk.Frame(self.frame, bg=t.bg_primary)
         container.pack(expand=True)
 
         # Criar card para cada emulador
@@ -91,17 +96,17 @@ class EmulatorSelectionPage:
 
             # Tentar fonte do sistema
             try:
-                font = ImageFont.truetype("segoeui.ttf", 72)
+                font_obj = ImageFont.truetype("segoeui.ttf", 72)
             except Exception:
-                font = ImageFont.load_default()
+                font_obj = ImageFont.load_default()
 
             emoji = emu.get("emoji", "🎮")
-            bbox = draw.textbbox((0, 0), emoji, font=font)
+            bbox = draw.textbbox((0, 0), emoji, font=font_obj)
             w = bbox[2] - bbox[0]
             h = bbox[3] - bbox[1]
             x = (self.ICON_SIZE[0] - w) // 2
             y = (self.ICON_SIZE[1] - h) // 2
-            draw.text((x, y), emoji, font=font, embedded_color=True)
+            draw.text((x, y), emoji, font=font_obj, embedded_color=True)
 
             photo = ImageTk.PhotoImage(img)
             self._icon_cache[emu["id"]] = photo
@@ -111,13 +116,15 @@ class EmulatorSelectionPage:
 
     def _create_emulator_card(self, parent: tk.Widget, emu: dict) -> tk.Frame:
         """Cria card de tamanho FIXO para o emulador."""
+        t = DARK_THEME
+        
         card = tk.Frame(
             parent,
-            bg='#2d2d2d',
+            bg=t.bg_card,
             width=self.CARD_WIDTH,
             height=self.CARD_HEIGHT,
             cursor='hand2',
-            highlightbackground='#3d3d3d',
+            highlightbackground=t.border_light,
             highlightthickness=1
         )
         # Fundamental: impede o frame de ajustar ao conteúdo
@@ -125,21 +132,21 @@ class EmulatorSelectionPage:
         card.grid_propagate(False)
 
         # Container interno centrado (para o conteúdo não colar nas bordas)
-        inner = tk.Frame(card, bg='#2d2d2d')
+        inner = tk.Frame(card, bg=t.bg_card)
         inner.place(relx=0.5, rely=0.45, anchor='center')
 
         # Ícone (todos do mesmo tamanho)
         icon_photo = self._load_emulator_icon(emu)
         if icon_photo:
-            lbl_icon = tk.Label(inner, image=icon_photo, bg='#2d2d2d')
+            lbl_icon = tk.Label(inner, image=icon_photo, bg=t.bg_card)
             lbl_icon.image = icon_photo  # Guardar ref.
         else:
             lbl_icon = tk.Label(
                 inner,
                 text=emu.get("emoji", "🎮"),
-                bg='#2d2d2d',
-                fg=emu.get("color", "white"),
-                font=('Segoe UI', 64)
+                bg=t.bg_card,
+                fg=emu.get("color", t.text_primary),
+                font=font(t, "font_size_3xl")
             )
         lbl_icon.pack()
 
@@ -152,9 +159,9 @@ class EmulatorSelectionPage:
         lbl_name = tk.Label(
             inner,
             text=display_name,
-            bg='#2d2d2d',
-            fg='white',
-            font=('Segoe UI', 12, 'bold'),
+            bg=t.bg_card,
+            fg=t.text_primary,
+            font=font(t, "font_size_md", bold=True),
             wraplength=200,
             justify='center',
             width=20  # Força largura de caracteres
@@ -163,16 +170,16 @@ class EmulatorSelectionPage:
 
         # Hover effects (apenas bg, sem mexer no conteúdo visual)
         def on_enter(e):
-            card.configure(bg='#3d3d3d', highlightbackground='#555555')
-            inner.configure(bg='#3d3d3d')
+            card.configure(bg=t.bg_hover, highlightbackground=t.border_hover)
+            inner.configure(bg=t.bg_hover)
             for child in inner.winfo_children():
-                child.configure(bg='#3d3d3d')
+                child.configure(bg=t.bg_hover)
 
         def on_leave(e):
-            card.configure(bg='#2d2d2d', highlightbackground='#3d3d3d')
-            inner.configure(bg='#2d2d2d')
+            card.configure(bg=t.bg_card, highlightbackground=t.border_light)
+            inner.configure(bg=t.bg_card)
             for child in inner.winfo_children():
-                child.configure(bg='#2d2d2d')
+                child.configure(bg=t.bg_card)
 
         # Bind em todos os widgets interativos
         for widget in [card, inner, lbl_icon, lbl_name]:

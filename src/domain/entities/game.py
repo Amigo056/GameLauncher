@@ -1,6 +1,5 @@
 """Entidades de domínio: Game, Rom, Cover."""
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from enum import Enum, auto

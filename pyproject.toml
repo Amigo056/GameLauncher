@@ -1,0 +1,211 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "GameLauncher"
+version = "1.0.0"
+description = "Launcher enterprise para emuladores de jogos retro"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "GameLauncher Team"},
+]
+keywords = ["emulator", "games", "launcher", "retro", "tkinter"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment",
+    "Topic :: Desktop Environment",
+]
+
+dependencies = [
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.31.0",
+    "pillow>=10.0.0",
+    "psutil>=5.9.0",
+    "pygame>=2.6.1",
+    "pycdlib>=1.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "mypy>=1.8.0",
+    "ruff>=0.3.0",
+    "pre-commit>=3.6.0",
+    "types-requests>=2.31.0",
+    "types-psutil>=5.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/user/gamelauncher"
+Repository = "https://github.com/user/gamelauncher"
+Issues = "https://github.com/user/gamelauncher/issues"
+
+# ─────────────────────────────────────────────
+# Ruff — Linter & Formatter
+# Substitui: black, flake8, isort, pydocstyle
+# ─────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"  # Python 3.10+
+line-length = 100
+indent-width = 4
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # pycodestyle
+    "E", "W",
+    # Pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # flake8-annotations
+    "ANN",
+    # flake8-bandit (segurança)
+    "S",
+    # flake8-docstrings
+    "D",
+    # flake8-comprehensions
+    "C4",
+    # flake8-return
+    "RET",
+    # flake8-unused-arguments
+    "ARG",
+    # eradicate (comentários mortos)
+    "ERA",
+    # pylint
+    "PL",
+]
+ignore = [
+    # D104: Missing docstring in public package (__init__.py vazios são OK)
+    "D104",
+    # ANN101: Missing type annotation for self (redundante)
+    "ANN101",
+    # ANN102: Missing type annotation for cls (redundante)
+    "ANN102",
+    # S603: subprocess call - check for execution of untrusted input
+    # (Nós controlamos o input, é seguro)
+    "S603",
+    # S607: Starting a process with a partial executable path
+    "S607",
+    # PLR0913: Too many arguments to function call
+    "PLR0913",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Testes: regras menos estritas
+"tests/**/*.py" = [
+    "S101",    # assert usado em testes
+    "ANN001",  # type annotations em fixtures
+    "ANN201",  # return types em testes
+    "D100",    # docstrings em ficheiros de teste
+    "D103",    # docstrings em funções de teste
+    "PLR2004", # magic values em testes
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# ─────────────────────────────────────────────
+# Mypy — Type Checking
+# ─────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+show_column_numbers = true
+
+# Módulos sem stubs
+[[tool.mypy.overrides]]
+module = [
+    "pycdlib.*",
+    "pygame.*",
+]
+ignore_missing_imports = true
+
+# ─────────────────────────────────────────────
+# Pytest — Testes
+# ─────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# ─────────────────────────────────────────────
+# Coverage — Cobertura de testes
+# ─────────────────────────────────────────────
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
